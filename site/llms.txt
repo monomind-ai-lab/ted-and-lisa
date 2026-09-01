@@ -29,7 +29,7 @@ A minimal working prompt for any coding agent:
 
 ## Website
 
-- [Intake panel](https://html.monomind.one/intake.html): answer it in a browser; the last step hands back a complete paste-ready prompt
+- [Intake panel](https://html.monomind.one/intake): answer it in a browser; the last step hands back a complete paste-ready prompt
 - [Live template previews](https://html.monomind.one/#templates): every gallery preview is a real generated file
 
 ## For teams and brands
