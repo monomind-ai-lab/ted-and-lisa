@@ -1,0 +1,33 @@
+# Runs the site assembly on every pull request — the same `bash site/sync.sh`
+# the deploy workflow runs, minus the deploy. Without this, the first time a
+# PR's changes meet the build is after merge, on main, in deploy-pages.yml.
+#
+# Same two checkouts as the deploy: sync.sh reads the template registry, the
+# gallery thumbnails, the intake panel and the MonoMind mark from
+# monomind-ai-lab/hi-ted-meet-lisa, which it expects at .skill/ (public
+# repository, so the workflow's own token reads it — no secret).
+#
+# No secrets on purpose: CF_BEACON_TOKEN stays unset here, and sync.sh
+# skips the analytics beacon when it is unset rather than failing or
+# shipping a placeholder — so a fork PR builds identically.
+
+name: PR build check
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the website
+        uses: actions/checkout@v4
+      - name: Check out the skill repository
+        uses: actions/checkout@v4
+        with:
+          repository: monomind-ai-lab/hi-ted-meet-lisa
+          path: .skill
+      - name: Assemble the deployable site folder
+        run: bash site/sync.sh

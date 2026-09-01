@@ -1,0 +1,117 @@
+# Checks the live surfaces at html.monomind.one once a day.
+#
+# The Pages project is direct-upload, so nothing rebuilds or redeploys the
+# site on its own — but the things this checks can still break without a
+# push here: a Cloudflare redirect or header rule edited in the dashboard,
+# the functions/ routes (SKILL.md and /e), the custom domain itself, or the
+# skill repository moving the raw SKILL.md that the no-install route names.
+# This workflow is the alarm for all of that: every assertion is a promise
+# some published document makes (llms.txt, the README, the skill's own
+# install instructions), so a failure here means a public link is lying.
+#
+# No secrets, no build — just curl against the live site, plus a sweep of
+# every html.monomind.one URL that site/llms.txt tells agents to follow.
+
+name: Live link checks
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily, 06:23 UTC — off-peak, off the top of the hour.
+    - cron: "23 6 * * *"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the repository
+        # Only needed for site/llms.txt, whose URLs are swept below.
+        uses: actions/checkout@v4
+
+      - name: Check the live surfaces
+        run: |
+          set -euo pipefail
+
+          FAILED=0
+          RESULTS=""
+
+          note() {  # status  url  detail
+            RESULTS="${RESULTS}$(printf '%-4s | %-72s | %s' "$1" "$2" "$3")"$'\n'
+            [ "$1" = "ok" ] || FAILED=1
+          }
+
+          # GET a URL (no redirect following) and report:
+          #   http-code  downloaded-bytes  content-type
+          probe() {
+            curl -sS -o /dev/null --max-time 30 \
+                 -w '%{http_code} %{size_download} %{content_type}' "$1" \
+              || echo "000 0 curl-error"
+          }
+
+          # -- The named surfaces ------------------------------------------
+
+          u="https://html.monomind.one/SKILL.md"
+          read -r code size ctype <<<"$(probe "$u")"
+          if [ "$code" = 200 ] && [ "$size" -gt 5000 ] \
+             && case "$ctype" in *text/markdown*) true;; *) false;; esac; then
+            note ok "$u" "200, ${size} bytes, ${ctype}"
+          else
+            note FAIL "$u" "want 200 + text/markdown + >5000 bytes, got ${code}, ${size} bytes, ${ctype}"
+          fi
+
+          u="https://html.monomind.one/skills.md"
+          hdrs="$(curl -sSI --max-time 30 "$u" | tr -d '\r')" || hdrs=""
+          code="$(printf '%s\n' "$hdrs" | awk 'toupper($1) ~ /^HTTP/ {print $2; exit}')"
+          loc="$(printf '%s\n' "$hdrs" | awk 'tolower($1) == "location:" {print $2; exit}')"
+          if [ "$code" = 301 ] && [ "$loc" = "/SKILL.md" ]; then
+            note ok "$u" "301 -> /SKILL.md"
+          else
+            note FAIL "$u" "want 301 -> /SKILL.md, got ${code:-none} -> ${loc:-none}"
+          fi
+
+          u="https://html.monomind.one/intake"
+          read -r code size ctype <<<"$(probe "$u")"
+          if [ "$code" = 200 ] && [ "$size" -gt 100000 ]; then
+            note ok "$u" "200, ${size} bytes"
+          else
+            note FAIL "$u" "want 200 + >100000 bytes, got ${code}, ${size} bytes"
+          fi
+
+          for u in "https://html.monomind.one/llms.txt" \
+                   "https://html.monomind.one/" \
+                   "https://raw.githubusercontent.com/monomind-ai-lab/hi-ted-meet-lisa/main/skills/lisa/SKILL.md"; do
+            read -r code size ctype <<<"$(probe "$u")"
+            if [ "$code" = 200 ]; then
+              note ok "$u" "200, ${size} bytes"
+            else
+              note FAIL "$u" "want 200, got ${code}"
+            fi
+          done
+
+          # -- Every html.monomind.one URL llms.txt points agents at -------
+          # Fragments are client-side, so they come off; so does trailing
+          # prose punctuation (the sample prompt ends a URL with a comma).
+
+          while read -r u; do
+            [ -n "$u" ] || continue
+            read -r code size ctype <<<"$(probe "$u")"
+            case "$code" in
+              [45]??|000) note FAIL "$u (llms.txt)" "want non-4xx/5xx, got ${code}" ;;
+              *)          note ok   "$u (llms.txt)" "$code" ;;
+            esac
+          done < <(grep -oE 'https://html\.monomind\.one[^ )">]*' site/llms.txt \
+                     | sed -e 's/#.*//' -e 's/[.,;:]*$//' | sort -u)
+
+          # -- Summary ------------------------------------------------------
+
+          echo
+          echo "======================== live surface summary ========================"
+          printf '%s' "$RESULTS"
+          echo "======================================================================"
+          if [ "$FAILED" -ne 0 ]; then
+            echo "one or more live surfaces failed their checks" >&2
+            exit 1
+          fi
+          echo "all live surfaces check out"
