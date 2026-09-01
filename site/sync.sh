@@ -70,6 +70,7 @@ fi
 # The local half, checked the same way for the same reason.
 compgen -G "previews/*.html" > /dev/null || die "no previews/*.html in this repository"
 for f in assets/tedlisaidea.jpg \
+         assets/tedmeetslisa.jpg \
          assets/ted-and-lisa-in-frame.png \
          assets/tedlisa-cover-og.jpg; do
   [ -f "$f" ] || die "missing '$f' in this repository"
@@ -122,7 +123,7 @@ print("site/intake.html written with", len(cards), "template cards")
 PY
 
 # Brand images referenced by the landing page.
-cp assets/tedlisaidea.jpg assets/ted-and-lisa-in-frame.png site/assets/
+cp assets/tedlisaidea.jpg assets/tedmeetslisa.jpg assets/ted-and-lisa-in-frame.png site/assets/
 cp "$SKILL"/assets/monomind-mark-white.svg site/assets/
 
 # The canonical mark uses currentColor, which an <img> renders black.
