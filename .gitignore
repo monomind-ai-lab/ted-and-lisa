@@ -1,0 +1,17 @@
+# site/ is assembled at deploy time by site/sync.sh. Only the five canonical
+# files are tracked: index.html, 404.html, llms.txt, robots.txt, sync.sh.
+site/previews/
+site/intake.html
+site/assets/
+site/SKILL.md
+
+# the skill checkout site/sync.sh reads from (the deploy workflow makes its
+# own; locally you clone it yourself)
+/.skill/
+
+# wrangler local state
+.wrangler/
+
+.DS_Store
+__pycache__/
+*.pyc

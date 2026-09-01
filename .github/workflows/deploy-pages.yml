@@ -1,0 +1,84 @@
+# Deploys the public site (site/ → html.monomind.one) to Cloudflare Pages
+# on every push to main.
+#
+# The Pages project is a direct-upload project, so this workflow *is* the
+# git connection: it assembles site/ (site/sync.sh) and ships it with
+# wrangler.
+#
+# TWO CHECKOUTS. Since the website was split out of the skill, site/sync.sh
+# reads from two repositories: this one for the previews and brand images,
+# and monomind-ai-lab/hi-ted-meet-lisa for the template registry, the
+# gallery thumbnails, the intake panel and the MonoMind mark. The second
+# checkout lands at .skill/, which is the default sync.sh looks for
+# (override with SKILL_DIR). That repository is public, so the default
+# GITHUB_TOKEN reads it — no extra secret, no PAT.
+#
+# Both jobs of the old single repository still hold here: sync.sh fails
+# loudly if the skill checkout is missing or incomplete, and the pre-deploy
+# gate below runs inside that checkout so it checks the panel it is about to
+# ship rather than one from some other commit.
+#
+# One repository secret is required:
+#   CLOUDFLARE_API_TOKEN — a Cloudflare API token with permission
+#   "Account · Cloudflare Pages · Edit" on the 1TM account.
+#   Create it at https://dash.cloudflare.com/profile/api-tokens, then:
+#   gh secret set CLOUDFLARE_API_TOKEN
+#
+# One is optional:
+#   CF_BEACON_TOKEN — the Cloudflare Web Analytics site token (cookieless,
+#   no consent banner needed). Dashboard → Web Analytics → Add a site →
+#   html.monomind.one, then: gh secret set CF_BEACON_TOKEN
+#   While it is unset, sync.sh skips the beacon rather than shipping a
+#   placeholder.
+#
+# The account id is not a secret and is set inline below. The Pages project
+# is still named hi-ted-meet-lisa — it is the project the custom domain and
+# the analytics bindings hang off, so it keeps the name the site was
+# created under whatever the repository is called.
+#
+# The wrangler step runs from the repository root, not from site/. That is
+# load-bearing: wrangler compiles functions/ from the current working
+# directory, so `pages deploy site` at the root is what carries functions/e.js
+# and functions/SKILL.md.js up with the static files.
+
+name: Deploy site to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the website
+        uses: actions/checkout@v4
+      - name: Check out the skill repository
+        # The panel, the registry, the thumbnails and the mark come from
+        # here. Public repository, so the workflow's own token is enough.
+        uses: actions/checkout@v4
+        with:
+          repository: monomind-ai-lab/hi-ted-meet-lisa
+          path: .skill
+      - name: Check the intake panel's fallback list against the registry
+        # The panel's file:// fallback copy of templates/templates.json is
+        # generated, not hand-maintained. Fail here rather than ship a
+        # canonical HTML file whose offline gallery is missing a template.
+        # Both files live in the skill checkout, and the script reports its
+        # findings as paths relative to that repository's root — so run it
+        # from there.
+        working-directory: .skill
+        run: python3 scripts/tedandlisa_intake_fallback.py --check
+      - name: Assemble the deployable site folder
+        run: bash site/sync.sh
+        env:
+          CF_BEACON_TOKEN: ${{ secrets.CF_BEACON_TOKEN }}
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: e9ac0943443affe2bd7b18971265deee
+          command: pages deploy site --project-name hi-ted-meet-lisa --branch main --commit-hash ${{ github.sha }}
