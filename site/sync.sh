@@ -96,7 +96,7 @@ entries = json.loads((skill / "templates/templates.json").read_text())["template
 cards = []
 for t in entries:
     card = {k: t.get(k) for k in
-            ("id", "name", "tagline", "kind", "type", "best_for", "dependencies",
+            ("id", "name", "tagline", "kind", "type", "layout", "best_for", "dependencies",
              "languages", "preview", "skill", "badge") if t.get(k) is not None}
     # `thumb` and `preview` are registry paths, relative to the skill repo.
     # Only their basenames survive: both land flat in site/previews/.
