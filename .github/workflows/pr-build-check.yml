@@ -41,6 +41,11 @@ jobs:
       - name: Install Chrome for the rendered checks
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
+        with:
+          # Stable release, not the action's default chromium snapshot —
+          # a snapshot build hung on every page load in the skill repo's
+          # CI; see the matching comment in that repo's checks.yml.
+          chrome-version: stable
       - name: Check the previews for rendered horizontal overflow
         env:
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
