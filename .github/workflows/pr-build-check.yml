@@ -10,6 +10,13 @@
 # No secrets on purpose: CF_BEACON_TOKEN stays unset here, and sync.sh
 # skips the analytics beacon when it is unset rather than failing or
 # shipping a placeholder — so a fork PR builds identically.
+#
+# After the build, the skill repo's rendered-overflow gate runs over every
+# preview: each file is loaded in headless Chrome (installed by
+# browser-actions/setup-chrome, since ubuntu-latest ships no browser) at
+# 1280/2000/375 and fails the PR when content escapes its box sideways —
+# e.g. a long mono token overflowing a fixed grid column, which never
+# widens the document and so is invisible to any static check.
 
 name: PR build check
 
@@ -31,3 +38,10 @@ jobs:
           path: .skill
       - name: Assemble the deployable site folder
         run: bash site/sync.sh
+      - name: Install Chrome for the rendered checks
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+      - name: Check the previews for rendered horizontal overflow
+        env:
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: python3 .skill/scripts/check_overflow.py previews/*.html

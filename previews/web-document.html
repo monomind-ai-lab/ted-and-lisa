@@ -32,6 +32,11 @@ code,.mono{font-family:var(--mono);font-size:13px}
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:rgba(15,15,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hairline-soft);display:flex;align-items:center;gap:24px;padding:0 24px}
 .nav .mark{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.2px;white-space:nowrap}
 .nav .mark .dot{width:10px;height:10px;border-radius:2px;background:var(--primary);box-shadow:0 0 12px var(--primary-glow)}
+/* overflow:visible is deliberate: the Documents dropdown lives inside this
+   row, and any overflow-x value that scrolls or clips would swallow its
+   open menu. The row therefore cannot shrink or scroll — the burger
+   breakpoint below is what must absorb a link row that outgrows the bar,
+   so it is tuned to this document's real links, not to a generic width. */
 .nav .links{display:flex;gap:4px;flex:1;justify-content:center;overflow:visible;scrollbar-width:none}
 .nav .links::-webkit-scrollbar{display:none}
 .nav .links a{font-size:14px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
@@ -41,14 +46,19 @@ code,.mono{font-family:var(--mono);font-size:13px}
 .lang-toggle button{background:transparent;border:0;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 12px;cursor:pointer;line-height:1}
 .lang-toggle button.active{background:var(--primary);color:#fff}
 .burger{display:none;background:transparent;border:1px solid var(--hairline-strong);border-radius:var(--r-md);color:var(--ink);width:40px;height:40px;font-size:16px;cursor:pointer;flex-shrink:0}
-@media(max-width:1120px){
+/* The template collapses at 1120px, sized for a handful of links. This
+   document carries thirteen: measured, they overflow a 1280px bar by 43px
+   and run over the language toggle, and the row can neither shrink nor
+   scroll (see .nav .links above). So the burger takes over at 1450px, the
+   first width at which the full row fits with room to breathe. */
+@media(max-width:1450px){
   .nav .links{position:fixed;top:64px;left:0;right:0;background:var(--canvas);border-bottom:1px solid var(--hairline);flex-direction:column;padding:12px;display:none;max-height:calc(100vh - 64px);overflow-y:auto}
   .nav .links.open{display:flex}
   .burger{display:block}
 }
 
 /* ---------- narrow-screen nav ----------
-   The rule above collapses .links into the burger at 1120px, but the mark's
+   The rule above collapses .links into the burger at 1450px, but the mark's
    text, the utilbar, the language pair and the burger still share one 64px
    row. Together they are wider than a phone, and because .nav is fixed it
    clips instead of widening the document -- so a horizontal-overflow check
@@ -158,7 +168,7 @@ strong{color:var(--body-strong);font-weight:600}
 .dropmenu a{font-size:14px;font-weight:500;color:var(--muted);padding:8px 12px;border-radius:var(--r-md);white-space:nowrap;line-height:1.4}
 .dropmenu a:hover{color:var(--body-strong);background:var(--card-elev)}
 .dropmenu a.active{color:var(--body-strong);background:var(--card)}
-@media(max-width:1120px){
+@media(max-width:1450px){ /* keep in step with the burger breakpoint above */
   .navdiv{width:100%;height:1px;margin:8px 0}
   .navdrop{width:100%}
   .navdrop>button{display:none}
