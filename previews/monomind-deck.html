@@ -1061,6 +1061,198 @@ html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15
     right: calc(max(16px, env(safe-area-inset-right)) + 46px + 8px); }
 }
 </style>
+<style id="lisa-variation-v4-blend">
+/* ==================================================================
+   LISA VARIATION v4 — BLEND (MonoMind deck 1.2.0, applied 2026-09-02)
+   The shipped template blend (skill repo commit 9d98859): v3-editorial
+   in full (body 18px at 1.65 leading, spacing tokens +35%, rebuilt
+   rhythm, wider gaps, real table cells) with the HEADLINE TREATMENT
+   from v2-presentation (h-md clamp(34/3.7vw/47) lh 1.16, hero cap
+   100px — cover 112, close 92 — loosened hero leading, -0.03em
+   tracking). Applied to this live preview as one appended override
+   block; the deck's own CSS above is untouched. Adapted to this
+   deck's drift: sibling components the golden run never painted
+   (wf-*, dg-map, dg-leader, dg-ordered, dg-flag, dg-startbar/endbar,
+   dg-phase-label, dg-treeview, plate-cap, code, bullets.tight,
+   dg-arrow) are mapped to the same tiers the shipped template uses.
+   Dropped as unmatched in this deck's markup: .cover-grid .h-hero,
+   .grid-3, .pstep, .dg-lane. Narrow-viewport rules this late block
+   would otherwise clobber are re-asserted at the end.
+   ================================================================== */
+:root {
+  /* body scale: v3 */
+  --text-xs: 13.5px;   /* was 12px  */
+  --text-sm: 15.5px;   /* was 14px  */
+  --text-base: 18px;   /* was 16px  */
+  --text-lg: 20px;     /* was 18px  */
+  --text-xl: 28px;     /* was 24px  */
+  /* display scale steps: v2 (headline treatment) */
+  --text-2xl: 46px;    /* was 36px  */
+  --text-3xl: 68px;    /* was 54px  */
+  --text-4xl: 100px;   /* was 76px  */
+  --leading-body: 1.65;/* v3; was 1.55 */
+  /* spacing: v3 (+~35%) */
+  --space-1: 5px;  --space-2: 11px; --space-3: 16px; --space-4: 22px;
+  --space-5: 28px; --space-6: 34px; --space-8: 44px; --space-12: 64px;
+}
+/* headlines: v2's display scale, read across a room */
+.h-hero { font-size: clamp(56px, 8.4vw, var(--text-4xl)); line-height: 1.1; letter-spacing: -0.03em; }
+.cover-hero .h-hero { font-size: clamp(54px, 7.8vw, 112px); margin-bottom: var(--space-6); }
+.close-grid .h-hero { font-size: clamp(52px, 7vw, 92px); }
+.h-md { font-size: clamp(34px, 3.7vw, 47px); line-height: 1.16; margin: 0 0 18px; }
+/* lead/body: v3 */
+.lead { font-size: clamp(17px, 1.4vw, 21px); line-height: 1.65; margin: 0 0 var(--space-2); }
+/* vertical rhythm: eyebrow -> headline -> lead -> components (v3) */
+.eyebrow { margin: 0 0 var(--space-6); letter-spacing: 0.12em; }
+.dg-canvas { margin-top: 36px; }
+/* cards and panels: more margin, generous internal padding (v3) */
+.dg-frame { font-size: 16px; padding: var(--space-6) var(--space-8) var(--space-6); }
+.dg-frame-label { font-size: 12.5px; margin-bottom: 14px; }
+.qcard { padding: var(--space-6); }
+.qcard h4 { font-size: 18.5px; line-height: 1.32; margin-top: 12px; }
+.qcard p { font-size: 14px; line-height: 1.55; margin-top: 10px; }
+.qcard .qn { font-size: 12.5px; }
+/* grids: wider gaps (v3; .grid-3 dropped — unused in this deck) */
+.grid-2 { gap: var(--space-6); }
+.grid-4 { gap: var(--space-4); }
+/* table: generous cell padding, taller rows (v3) */
+.tbl { font-size: 15.5px; margin-top: var(--space-4); }
+.tbl th { font-size: 12px; padding: 0 var(--space-5) 14px 0; }
+.tbl td { padding: 14px var(--space-5) 14px 0; line-height: 1.55; }
+.tbl td.k { font-size: 14.5px; }
+.bullets li { font-size: 15.5px; line-height: 1.55; padding: 13px 0 13px var(--space-8); }
+.bullets li::before { top: 21px; width: 14px; }
+.dg-chip-row { gap: 14px; margin-top: var(--space-4); }
+.dg-chip { padding: 15px 20px; }
+.dg-chip .nm { font-size: 15px; }
+.dg-chip .ds { margin-top: 6px; line-height: 1.5; }
+.dg-step { padding: 14px 0; gap: var(--space-4); }
+.dg-step h4 { font-size: 15.5px; margin-bottom: 4px; }
+.dg-step p { font-size: 13.5px; line-height: 1.5; }
+.dg-step .nb-circle { width: 26px; height: 26px; font-size: 12px; }
+.dg-loop { margin-top: var(--space-6); padding: 15px var(--space-8); font-size: 14px; }
+.cover-meta { gap: var(--space-4); margin-top: var(--space-8); }
+.cover-meta span { font-size: 12.5px; padding: 9px var(--space-5); }
+.close-grid { gap: var(--space-6); }
+.close-links { gap: var(--space-4); }
+.close-links a { font-size: 13.5px; padding: 11px var(--space-6); }
+/* ── sibling components this deck paints, mapped to the shipped
+      1.2.0 tiers (template commit 9d98859) ─────────────────────── */
+.dg-arrow { font-size: 13px; }
+.dg-leader-row { padding: 13px 0; }
+.dg-leader-name { font-size: 15.5px; }
+.dg-ordered li { padding: 7px 0; }
+.dg-ordered li::before { font-size: 12.5px; }
+.dg-ordered li span { font-size: 15px; line-height: 1.5; }
+.dg-flag { padding: 15px 20px; }
+.dg-flag .fl { font-size: 14.5px; }
+.dg-flag .fd { font-size: 13.5px; margin-top: 4px; }
+.dg-startbar, .dg-endbar { padding: 13px var(--space-5); font-size: 12.5px; }
+.dg-endbar { font-size: 15.5px; }
+.dg-phase-label { font-size: 12.5px; }
+.dg-treeview, .dg-treeview ul { font-size: 14px; }
+.dg-map { row-gap: 13px; }
+.dg-map-h { font-size: 12px; }
+.dg-map-row-l, .dg-map-row-r { padding: 13px var(--space-4); font-size: 15px; }
+.dg-map-summary { font-size: 15px; }
+.plate-cap { font-size: 12px; }
+.code { font-size: 15px; }
+.code.sm { font-size: 13px; }
+.bullets.tight li { padding-top: 9px; padding-bottom: 9px; font-size: 15px; }
+.wf-phase { font-size: 12px; }
+.wf-node .n { width: 26px; height: 26px; font-size: 12px; }
+.wf-node h4 { font-size: 15.5px; }
+.wf-node p { font-size: 13.5px; line-height: 1.5; }
+/* slide padding: v3's frame, desktop only (this deck's <=1100px layout
+   is a scrolling surface with its own safe-area padding — untouched) */
+@media (min-width: 1101px) {
+  .slide { padding: clamp(56px, 8vw, 120px) clamp(56px, 9.4vw, 140px); }
+  /* hero-padding fix carried from v2/v3 verification (1280x800 clip) */
+  .slide.hero { padding-block: clamp(64px, 8.5vw, 136px); }
+  .slide.dg-slide { padding-block: clamp(44px, 5.2vw, 70px); }
+}
+/* ── per-slide relief (desktop one-screen composition only) ────────
+   This deck paints denser slides than the golden run; where the grown
+   scale overflowed 1280x800 or pushed content under the fixed bottom
+   chrome (~50px), the fix is scoped to that slide's components rather
+   than shrinking the global scale. Measured at 1280x800 before
+   relief (bottom clearance, baseline design line is 59px): s3 10,
+   s4 -76, s7 -54, s6 28*, s11 19*, s12 9*, s14 24*, s16 -3, s17 47*,
+   s18 60 (*after the type grew, no box overflow but chrome collision).
+   Below 1101px the deck scrolls, so no relief applies. */
+@media (min-width: 1101px) {
+  /* 03 pipeline: two wf bands + endbar */
+  [data-od-id="slide-pipeline"] .dg-canvas { margin-top: 16px; }
+  [data-od-id="slide-pipeline"] .wf { gap: var(--space-3); margin-bottom: var(--space-3); }
+  [data-od-id="slide-pipeline"] .wf-node { padding: 12px var(--space-4) var(--space-3); }
+  [data-od-id="slide-pipeline"] .wf-node h4 { font-size: 14.5px; }
+  [data-od-id="slide-pipeline"] .wf-node p { font-size: 12.5px; line-height: 1.45; }
+  [data-od-id="slide-pipeline"] .dg-endbar { padding: 10px var(--space-5); }
+  /* 04 overview: three frames whose chip columns stack tallest */
+  [data-od-id="slide-overview"] .dg-canvas { margin-top: 14px; }
+  [data-od-id="slide-overview"] .eyebrow { margin-bottom: var(--space-4); }
+  [data-od-id="slide-overview"] .h-md { margin-bottom: 10px; }
+  [data-od-id="slide-overview"] .dg-frame { padding: var(--space-3) var(--space-6); font-size: 15px; }
+  [data-od-id="slide-overview"] .dg-frame-note { margin-top: 6px; }
+  [data-od-id="slide-overview"] .dg-chip { padding: 9px 16px; }
+  [data-od-id="slide-overview"] .dg-chip-row { gap: 8px; margin-top: var(--space-3); }
+  [data-od-id="slide-overview"] .dg-loop { margin-top: 14px; padding: 10px var(--space-6); }
+  /* 06 install: prompt frame + arrow + chip frame */
+  [data-od-id="slide-install"] .dg-canvas { margin-top: 20px; }
+  [data-od-id="slide-install"] .dg-frame { padding: var(--space-4) var(--space-6); }
+  [data-od-id="slide-install"] .dg-arrow { margin: 6px 0; }
+  /* 07 init: seven ordered steps + flag row + note */
+  [data-od-id="slide-init"] .dg-canvas { margin-top: 14px; }
+  [data-od-id="slide-init"] .eyebrow { margin-bottom: var(--space-4); }
+  [data-od-id="slide-init"] .dg-frame { padding: var(--space-3) var(--space-6); }
+  [data-od-id="slide-init"] .dg-frame-note { margin-top: 6px; }
+  [data-od-id="slide-init"] .dg-arrow { margin: 6px 0; }
+  [data-od-id="slide-init"] .dg-ordered li { padding: 3px 0; }
+  [data-od-id="slide-init"] .dg-ordered li span { font-size: 13.5px; line-height: 1.42; }
+  [data-od-id="slide-init"] .dg-flag { padding: 9px 16px; }
+  /* 11 consolidation: seven tight bullets in a half-width frame */
+  [data-od-id="slide-consolidation"] .dg-canvas { margin-top: 16px; }
+  [data-od-id="slide-consolidation"] .dg-frame { padding: var(--space-4) var(--space-6); }
+  [data-od-id="slide-consolidation"] .bullets.tight li { padding-top: 6px; padding-bottom: 6px; }
+  /* 12 doctor: code frame + arrow + five chips */
+  [data-od-id="slide-doctor"] .dg-canvas { margin-top: 14px; }
+  [data-od-id="slide-doctor"] .dg-frame { padding: var(--space-4) var(--space-6); }
+  [data-od-id="slide-doctor"] .dg-arrow { margin: 6px 0; }
+  [data-od-id="slide-doctor"] .dg-chip { padding: 11px 16px; }
+  [data-od-id="slide-doctor"] .dg-chip-row { margin-top: var(--space-3); }
+  /* 14 tools: table rows carry the height */
+  [data-od-id="slide-tools"] .dg-canvas { margin-top: 14px; }
+  [data-od-id="slide-tools"] .dg-frame { padding: var(--space-4) var(--space-6); }
+  [data-od-id="slide-tools"] .dg-frame-note { margin-top: 6px; }
+  [data-od-id="slide-tools"] .tbl td { padding-top: 10px; padding-bottom: 10px; }
+  /* 16 repo: ~20 tree rows */
+  [data-od-id="slide-repo"] .dg-canvas { margin-top: 16px; }
+  [data-od-id="slide-repo"] .dg-frame { padding: 18px var(--space-6); }
+  [data-od-id="slide-repo"] .dg-treeview, [data-od-id="slide-repo"] .dg-treeview ul { font-size: 13px; }
+  [data-od-id="slide-repo"] .dg-treeview li { padding-top: 2px; padding-bottom: 2px; }
+  /* 17 dataflow: five map rows + summary */
+  [data-od-id="slide-dataflow"] .dg-canvas { margin-top: 24px; }
+  /* 18 closing hero */
+  [data-od-id="slide-closing"] .close-grid { gap: var(--space-5); }
+}
+/* re-assert narrow-viewport steps after the global overrides above */
+@media (max-width: 1100px) {
+  .tbl { font-size: 14px; }
+  .tbl th, .tbl td { padding-right: var(--space-3); }
+}
+@media (max-width: 680px) {
+  /* phone headline steps: v2 (headline treatment) */
+  .h-hero, .cover-hero .h-hero { font-size: clamp(42px, 11.5vw, 60px); max-width: 100%; overflow-wrap: anywhere; }
+  .h-md { font-size: clamp(28px, 7.6vw, 36px); }
+  /* the fixed 26% key column is ~90px at 375; the grown th wrapped mid-word */
+  .tbl th { font-size: 11px; letter-spacing: 0.05em; }
+  /* this deck's own phone rules the appended globals would clobber */
+  .dg-frame { padding: var(--space-4) 18px 18px; }
+  .dg-treeview, .dg-treeview ul { font-size: 11px; }
+  .dg-map { row-gap: var(--space-2); }
+  .cover-meta { gap: var(--space-2); }
+}
+</style>
 </head>
 <body>
 
