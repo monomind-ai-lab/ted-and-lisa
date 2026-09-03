@@ -843,8 +843,9 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
              the bridge card below. Several gallery entries in `T` are keyed on
              `.gallery .card:nth-child(N)` for N = 1…7, so inserting anywhere
              above would silently point them at the wrong card; appending
-             leaves 1…7 where they were. The bridge card is renumbered from 8
-             to 10 by this, and every one of its entries is keyed on
+             leaves 1…7 where they were. It renumbers the bridge card below —
+             which has happened again since, so no number is written down
+             here — and every one of that card's entries is keyed on
              `.card.yours`, so nothing of its moves. -->
         <a class="card handoff" target="_blank" href="previews/slide-design.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
@@ -869,6 +870,25 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           bar charts, decision boxes — inverted pages mark the seams.</p>
           <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
+        <!-- The last of the nine real templates to get a card. Its preview
+             has been generated and served all along — only the card was
+             missing, so previews/motion-website.html was reachable only by
+             typing the URL.
+
+             Position 10, which is past the seven `T` entries keyed on
+             `.gallery .card:nth-child(N)` for N = 1…7: those stay exactly
+             where they were. It pushes the bridge card from 10 to 11 and
+             Lisa's PPT from 11 to 12, and neither notices — the bridge card
+             is keyed on `.card.yours` and Lisa's PPT on its href. This one
+             is keyed on its own href for the same reason. -->
+        <a class="card" target="_blank" href="previews/motion-website.html" rel="noopener noreferrer">
+          <div class="frame"><img src="previews/motion-website.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Motion Website <span class="kind">site</span></h3>
+          <p>The project site with a motion layer — the hero rises in sequence,
+          the command types itself, cards light up under the pointer. CSS and
+          WAAPI only, no library.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
+        </a>
         <a class="card yours" href="#for-teams">
           <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
           <div class="meta"><h3>Your Template <span class="kind">yours</span></h3>
@@ -879,31 +899,37 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           patterns, protected terms — installed beside these, in your own agent.
           <b>See how →</b></p></div>
         </a>
-        <!-- Appended past the end of the gallery, which is what D-035 asks
-             for and not merely where there happened to be room. Several
-             entries in `T` are keyed on `.gallery .card:nth-child(N)` for
-             N = 1…7, and the note above records the bridge card sitting at
-             10; inserting anywhere before this point would move one of those
-             and silently point an entry at the wrong card. Appending past
-             the last one leaves every existing position exactly as it was —
-             1…10 all unmoved, including the bridge card the note names — and
-             makes this card 11. Its own entries in `T` are keyed on its href
-             rather than a position, so it takes its translations with it.
+        <!-- Last, which is what D-035 asks for and not merely where there
+             happened to be room. Several entries in `T` are keyed on
+             `.gallery .card:nth-child(N)` for N = 1…7; inserting anywhere
+             before those would move one of them and silently point an entry
+             at the wrong card. Sitting at the end leaves every one of them
+             where it is. Its own entries in `T` are keyed on its href rather
+             than a position, so it takes its translations with it — which is
+             also why the card ahead of it could be appended without touching
+             anything here.
 
-             It is also the only card here that is not a live preview.
-             Lisa's PPT is a separate, install-only repository: this site
-             builds nothing for it, hosts nothing of it, and has nothing to
-             open — so the frame carries the format badge instead of a
-             thumbnail, exactly as the intake panel does for a registry entry
-             with no `thumb`, and the hover label says where the link goes
-             rather than promising a preview. -->
-        <a class="card lisa-ppt" target="_blank" href="https://github.com/monomind-ai-lab/lisa-ppt" rel="noopener noreferrer">
-          <div class="frame empty"><span class="noshot">PPTX</span><span class="open">Open on GitHub</span></div>
+             It is the only card in this gallery that is not a live preview,
+             and the only one that leaves the gallery rather than opening in
+             the lightbox. Lisa's PPT is a separate, affiliated product — a
+             PowerPoint plugin installed on its own — so this site builds
+             nothing for it and hosts nothing of it: the frame carries the
+             format badge instead of a thumbnail, exactly as the intake panel
+             does for a registry entry with no `thumb`, and the hover label
+             says where the link goes rather than promising a preview.
+
+             The link is this site's own page for it, /lisa-ppt, not the
+             repository. The page is where the difference, the install
+             commands and the workflow are explained, and it links the
+             repository at the end — so the card no longer promises GitHub
+             and then drops a reader into a README. -->
+        <a class="card lisa-ppt" href="lisa-ppt">
+          <div class="frame empty"><span class="noshot">PPTX</span><span class="open">See what it is</span></div>
           <div class="meta"><h3>Lisa's PPT <span class="kind">pptx · install-only</span></h3>
-          <p>PowerPoint, not HTML. A separate repository you install yourself —
+          <p>PowerPoint, not HTML. A separate product you install yourself —
           nothing on this site builds one, so there is nothing here to preview.
           It hands your agent a real, editable <code>.pptx</code> carrying the
-          same house style as everything above. <b>On GitHub →</b></p>
+          same house style as everything above. <b>See what it is →</b></p>
           <span class="layout" data-layout="stage">▭ Fixed 16:9 stage — letterboxed on phones</span></div>
         </a>
       </div>
@@ -1481,7 +1507,7 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
     ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
     ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
-    /* The two newest cards are keyed on their own preview href, not on
+    /* Every card added since is keyed on its own preview href, not on
        `:nth-child` — the seven entries above are positional and only stay
        correct while nothing above them renumbers. A card keyed on its own
        href takes its selector with it wherever it ends up. */
@@ -1489,6 +1515,8 @@ function googleTranslateElementInit() {
     ['.gallery a[href="previews/evidence-deck.html"] .meta p', '숫자로 논증하는 슬라이드. 어두운 바탕에 세로 스크롤 스냅 — 강조된 행이 있는 데이터 표, 수치 행, 판정 바.', '用數字論證的投影片。深色底、垂直捲動吸附 — 會標出重點列的資料表、數據列、結論條。'],
     ['.gallery a[href="previews/paper-brief.html"] .kind', '브리프', '簡報'],
     ['.gallery a[href="previews/paper-brief.html"] .meta p', '밝은 종이 위, 챕터로 끊어 읽는 브리핑. 큼직한 숫자, 막대 차트, 의사결정 박스 — 반전된 페이지가 이음매를 표시합니다.', '淺色紙面上、以章節分段的簡報。放大的數字、長條圖、決策方塊 — 反白頁面標出每一段的接縫。'],
+    ['.gallery a[href="previews/motion-website.html"] .kind', '사이트', '網站'],
+    ['.gallery a[href="previews/motion-website.html"] .meta p', '모션 레이어를 입은 프로젝트 사이트 — 히어로가 순서대로 떠오르고, 명령어가 스스로 타이핑되고, 카드가 포인터를 따라 밝아집니다. CSS와 WAAPI뿐, 라이브러리는 없습니다.', '加上動態層的專案網站 — 首屏依序浮現、指令自己打字、卡片隨著指標亮起。只用 CSS 與 WAAPI，不載任何函式庫。'],
     /* The layout mark, one entry per value rather than one per card: the
        selector is the `data-layout` the card itself carries, so it reaches
        every card with that value and none without one. Nothing here is
@@ -1496,15 +1524,18 @@ function googleTranslateElementInit() {
        nothing — and a new card of either kind is translated the moment it
        is written. The three strings are the intake panel's own `layouts`
        labels, verbatim, so the mark reads identically on both surfaces. */
-    /* Lisa's PPT, keyed on its own href like the two cards before it. The
-       `.open` entry has to be here rather than left to `.gallery .open`
-       above: that one carries the all-elements flag and would relabel this
-       card "live preview", which is the one thing it is not. Later entries
-       win, so this one lands after it — the same arrangement the bridge
-       card's `.open` already uses. */
-    ['.gallery a[href="https://github.com/monomind-ai-lab/lisa-ppt"] .open', 'GitHub에서 열기', '前往 GitHub'],
-    ['.gallery a[href="https://github.com/monomind-ai-lab/lisa-ppt"] .kind', 'PPTX · 설치 전용', 'PPTX · 僅供安裝'],
-    ['.gallery a[href="https://github.com/monomind-ai-lab/lisa-ppt"] .meta p', 'HTML이 아니라 PowerPoint입니다. 직접 설치하는 별도 저장소이며 — 이 사이트가 만들어 주는 것은 없고, 그래서 여기서 미리 볼 것도 없습니다. 위의 템플릿들과 같은 하우스 스타일을 담아, 편집 가능한 진짜 <code>.pptx</code>를 에이전트가 건네줍니다. <b>GitHub에서 보기 →</b>', '是 PowerPoint，不是 HTML。它是另一個要自行安裝的儲存庫 — 這個網站不會產生它，也因此這裡沒有東西可以預覽。它會讓你的 agent 交回一個可編輯的真實 <code>.pptx</code>，帶著和上面同一套視覺系統。<b>前往 GitHub →</b>'],
+    /* Lisa's PPT, keyed on its own href like every card added since the
+       positional seven. That href is now this site's own page for it,
+       `lisa-ppt`, rather than the repository — the card sends a reader to
+       the page, and the page sends them on to GitHub. The `.open` entry has
+       to be here rather than left to `.gallery .open` above: that one
+       carries the all-elements flag and would relabel this card "live
+       preview", which is the one thing it is not. Later entries win, so
+       this one lands after it — the same arrangement the bridge card's
+       `.open` already uses. */
+    ['.gallery a[href="lisa-ppt"] .open', '무엇인지 보기', '看看它是什麼'],
+    ['.gallery a[href="lisa-ppt"] .kind', 'PPTX · 설치 전용', 'PPTX · 僅供安裝'],
+    ['.gallery a[href="lisa-ppt"] .meta p', 'HTML이 아니라 PowerPoint입니다. 직접 설치하는 별도 제품이며 — 이 사이트가 만들어 주는 것은 없고, 그래서 여기서 미리 볼 것도 없습니다. 위의 템플릿들과 같은 하우스 스타일을 담아, 편집 가능한 진짜 <code>.pptx</code>를 에이전트가 건네줍니다. <b>무엇인지 보기 →</b>', '是 PowerPoint，不是 HTML。它是另一個要自行安裝的產品 — 這個網站不會產生它，也因此這裡沒有東西可以預覽。它會讓你的 agent 交回一個可編輯的真實 <code>.pptx</code>，帶著和上面同一套視覺系統。<b>看看它是什麼 →</b>'],
     ['.gallery .layout[data-layout="reflow"]', '↔ 어떤 화면에도 맞춰 흐름', '↔ 隨螢幕自動重排', 1],
     ['.gallery .layout[data-layout="stage"]', '▭ 고정 16:9 스테이지 — 휴대폰에서는 레터박스', '▭ 固定 16:9 舞台 — 手機上留黑邊', 1],
     ['.card.yours .yours-hint', '당신의 스타일 자리', '你的風格在這'],
