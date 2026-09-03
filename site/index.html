@@ -843,8 +843,9 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
              the bridge card below. Several gallery entries in `T` are keyed on
              `.gallery .card:nth-child(N)` for N = 1…7, so inserting anywhere
              above would silently point them at the wrong card; appending
-             leaves 1…7 where they were. The bridge card is renumbered from 8
-             to 10 by this, and every one of its entries is keyed on
+             leaves 1…7 where they were. It renumbers the bridge card below —
+             which has happened again since, so no number is written down
+             here — and every one of that card's entries is keyed on
              `.card.yours`, so nothing of its moves. -->
         <a class="card handoff" target="_blank" href="previews/slide-design.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
@@ -867,6 +868,25 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           <div class="meta"><h3>Paper Brief <span class="kind">brief</span></h3>
           <p>A briefing on light paper, paced in chapters. Oversized numbers,
           bar charts, decision boxes — inverted pages mark the seams.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
+        </a>
+        <!-- The last of the nine real templates to get a card. Its preview
+             has been generated and served all along — only the card was
+             missing, so previews/motion-website.html was reachable only by
+             typing the URL.
+
+             Position 10, which is past the seven `T` entries keyed on
+             `.gallery .card:nth-child(N)` for N = 1…7: those stay exactly
+             where they were. It pushes the bridge card from 10 to 11 and
+             Lisa's PPT from 11 to 12, and neither notices — the bridge card
+             is keyed on `.card.yours` and Lisa's PPT on its href. This one
+             is keyed on its own href for the same reason. -->
+        <a class="card" target="_blank" href="previews/motion-website.html" rel="noopener noreferrer">
+          <div class="frame"><img src="previews/motion-website.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
+          <div class="meta"><h3>Motion Website <span class="kind">site</span></h3>
+          <p>The project site with a motion layer — the hero rises in sequence,
+          the command types itself, cards light up under the pointer. CSS and
+          WAAPI only, no library.</p>
           <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card yours" href="#for-teams">
@@ -1481,7 +1501,7 @@ function googleTranslateElementInit() {
     ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
     ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
     ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
-    /* The two newest cards are keyed on their own preview href, not on
+    /* Every card added since is keyed on its own preview href, not on
        `:nth-child` — the seven entries above are positional and only stay
        correct while nothing above them renumbers. A card keyed on its own
        href takes its selector with it wherever it ends up. */
@@ -1489,6 +1509,8 @@ function googleTranslateElementInit() {
     ['.gallery a[href="previews/evidence-deck.html"] .meta p', '숫자로 논증하는 슬라이드. 어두운 바탕에 세로 스크롤 스냅 — 강조된 행이 있는 데이터 표, 수치 행, 판정 바.', '用數字論證的投影片。深色底、垂直捲動吸附 — 會標出重點列的資料表、數據列、結論條。'],
     ['.gallery a[href="previews/paper-brief.html"] .kind', '브리프', '簡報'],
     ['.gallery a[href="previews/paper-brief.html"] .meta p', '밝은 종이 위, 챕터로 끊어 읽는 브리핑. 큼직한 숫자, 막대 차트, 의사결정 박스 — 반전된 페이지가 이음매를 표시합니다.', '淺色紙面上、以章節分段的簡報。放大的數字、長條圖、決策方塊 — 反白頁面標出每一段的接縫。'],
+    ['.gallery a[href="previews/motion-website.html"] .kind', '사이트', '網站'],
+    ['.gallery a[href="previews/motion-website.html"] .meta p', '모션 레이어를 입은 프로젝트 사이트 — 히어로가 순서대로 떠오르고, 명령어가 스스로 타이핑되고, 카드가 포인터를 따라 밝아집니다. CSS와 WAAPI뿐, 라이브러리는 없습니다.', '加上動態層的專案網站 — 首屏依序浮現、指令自己打字、卡片隨著指標亮起。只用 CSS 與 WAAPI，不載任何函式庫。'],
     /* The layout mark, one entry per value rather than one per card: the
        selector is the `data-layout` the card itself carries, so it reaches
        every card with that value and none without one. Nothing here is
