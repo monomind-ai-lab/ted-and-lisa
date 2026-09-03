@@ -97,16 +97,16 @@ cards = []
 for t in entries:
     # This projection is a whitelist, so a registry field it does not name is
     # dropped on the way to the panel — silently, and visible only as a card
-    # missing a line nobody remembers writing. `requires` is an install
-    # precondition ("this needs X on the machine before it can run"), a
-    # different claim from `dependencies` ("this file loads Y at runtime"),
-    # and the one a reader needs first when deciding whether a template is
-    # usable at all. No entry carries it yet, so the key is simply absent
-    # from every card until the registry upstream ships it; nothing here has
-    # to change on the day it does.
+    # missing a line nobody remembers writing. That cuts both ways, and it is
+    # why `requires` is no longer listed: it was added here for one entry,
+    # Lisa's PPT, which is not a template of this skill at all and is being
+    # taken out of the registry upstream. Dropping the key rather than the
+    # whole projection is deliberate — a whitelist ignores a field it does
+    # not name, so this keeps building unchanged against a registry that
+    # still carries `requires` and against one that no longer does.
     card = {k: t.get(k) for k in
             ("id", "name", "tagline", "kind", "type", "layout", "best_for", "dependencies",
-             "requires", "languages", "preview", "skill", "badge") if t.get(k) is not None}
+             "languages", "preview", "skill", "badge") if t.get(k) is not None}
     # `thumb` and `preview` are registry paths, relative to the skill repo.
     # Only their basenames survive: both land flat in site/previews/.
     thumb = skill / t.get("thumb", "")
