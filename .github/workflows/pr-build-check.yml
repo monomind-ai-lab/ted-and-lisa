@@ -11,13 +11,21 @@
 # skips the analytics beacon when it is unset rather than failing or
 # shipping a placeholder — so a fork PR builds identically.
 #
-# Two gates run alongside it. Before the build, scripts/check_gallery.py holds
-# the landing page's hand-written gallery to the skill's template registry:
-# the intake panel is generated from templates/templates.json, but the gallery
-# in site/index.html is prose, so a template can land upstream and have no
-# card — motion-website did, for a whole release wave, its live preview served
-# and reachable only by typing the URL. That gate reads the same .skill/
+# Three gates run alongside it. Before the build, scripts/check_gallery.py
+# holds the landing page's hand-written gallery to the skill's template
+# registry: the intake panel is generated from templates/templates.json, but
+# the gallery in site/index.html is prose, so a template can land upstream and
+# have no card — motion-website did, for a whole release wave, its live preview
+# served and reachable only by typing the URL. That gate reads the same .skill/
 # checkout and fails the PR before anything is assembled.
+#
+# Beside it, scripts/check_gallery_translations.py holds each of those cards to
+# the `T` table in the same file. The card copy is written by hand in three
+# languages, so a card can have its card and still render English inside a
+# Korean or Chinese page. That one reads site/index.html and nothing else — no
+# registry, no .skill/ — so it also runs on a fork PR that checked out nothing
+# else, and it is ordered first for that reason: the cheapest gate, and the one
+# with the fewest ways to be unable to run.
 #
 # After the build, the skill repo's rendered-overflow gate runs over every
 # preview: each file is loaded in headless Chrome (installed by
@@ -44,6 +52,11 @@ jobs:
         with:
           repository: monomind-ai-lab/hi-ted-meet-lisa
           path: .skill
+      - name: Check the gallery cards against the translation table
+        # Reads site/index.html alone, so it says the same thing here as it
+        # does on a laptop. Runs from the repository root, like the gate
+        # below, which is where both scripts resolve site/ from.
+        run: python3 scripts/check_gallery_translations.py
       - name: Check the landing-page gallery against the registry
         # Runs before the assembly: the registry, the page and the previews
         # are all canonical as checked out, so a missing card fails here

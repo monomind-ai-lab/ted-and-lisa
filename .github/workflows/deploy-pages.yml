@@ -18,13 +18,20 @@
 # gates below run against that checkout so they check the panel and the
 # registry it is about to ship rather than ones from some other commit.
 #
-# There are two of those gates, one per gallery. The intake panel's fallback
-# list is generated, and its check lives in the skill repository. The landing
-# page's gallery is hand-written prose, and its check lives here
+# There are three of those gates. Two are one per gallery: the intake panel's
+# fallback list is generated, and its check lives in the skill repository; the
+# landing page's gallery is hand-written prose, and its check lives here
 # (scripts/check_gallery.py). A deploy that shipped a gallery missing a
 # template would look fine from the outside — which is exactly how
-# motion-website stayed unreachable for a release wave — so both run before
-# the assembly and either one stops the deploy.
+# motion-website stayed unreachable for a release wave.
+#
+# The third, scripts/check_gallery_translations.py, is the same class of
+# silent drift one level in: a card that exists but has no entries in the `T`
+# table renders English inside a Korean or Chinese page, and looks fine from
+# the outside in English. It needs neither checkout's registry — only
+# site/index.html — so it runs first.
+#
+# All three run before the assembly and any one of them stops the deploy.
 #
 # One repository secret is required:
 #   CLOUDFLARE_API_TOKEN — a Cloudflare API token with permission
@@ -71,6 +78,14 @@ jobs:
         with:
           repository: monomind-ai-lab/hi-ted-meet-lisa
           path: .skill
+      - name: Check the gallery cards against the translation table
+        # The landing page's card copy is hand-written in three languages, so
+        # a card is translated only when somebody writes its `T` entries. Fail
+        # here rather than deploy a gallery that turns half-English the moment
+        # a reader switches language. Reads site/index.html alone — no
+        # registry, either checkout's — and runs from the repository root,
+        # which is where it resolves site/ from.
+        run: python3 scripts/check_gallery_translations.py
       - name: Check the intake panel's fallback list against the registry
         # The panel's file:// fallback copy of templates/templates.json is
         # generated, not hand-maintained. Fail here rather than ship a
