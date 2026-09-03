@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lisa's PPT — PowerPoint, not HTML</title>
+<meta name="description" content="Lisa's PPT is a separate plugin that hands your agent a real, editable .pptx in the MonoMind house style. Two commands to install. Nothing on this site builds or hosts it.">
+<link rel="canonical" href="https://html.monomind.one/lisa-ppt">
+<meta name="theme-color" content="#15160f">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://html.monomind.one/lisa-ppt">
+<meta property="og:site_name" content="Hi Ted, Meet Lisa">
+<meta property="og:title" content="Lisa's PPT — PowerPoint, not HTML">
+<meta property="og:description" content="Everything else on this site is one standalone HTML file. Lisa's PPT is the exception: a separate plugin that builds a real, editable .pptx in the same house style.">
+<meta property="og:image" content="https://html.monomind.one/assets/tedlisa-cover-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hi Ted, Meet Lisa — Ted and Lisa in a white frame over a blurred poppy photograph.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lisa's PPT — PowerPoint, not HTML">
+<meta name="twitter:description" content="A separate plugin that hands your agent a real, editable .pptx in the MonoMind house style. Two commands to install.">
+<meta name="twitter:image" content="https://html.monomind.one/assets/tedlisa-cover-og.jpg">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<!-- A second application, not a second description of the first one. The
+     landing page's JSON-LD describes Hi Ted, Meet Lisa; this describes the
+     affiliated product, points `sameAs` at its own repository, and relates
+     the two rather than merging them. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Lisa's PPT",
+  "url": "https://html.monomind.one/lisa-ppt",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "An agent plugin that builds an editable PowerPoint (.pptx) deck in the MonoMind house style. Installed separately from Hi Ted, Meet Lisa, which produces standalone HTML files only.",
+  "image": "https://html.monomind.one/assets/tedlisa-cover-og.jpg",
+  "publisher": { "@type": "Organization", "name": "MonoMind AI Lab", "url": "https://monomind.one" },
+  "sameAs": ["https://github.com/monomind-ai-lab/lisa-ppt"],
+  "isRelatedTo": { "@type": "SoftwareApplication", "name": "Hi Ted, Meet Lisa", "url": "https://html.monomind.one/" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── tokens ─────────────────────────────────────────────────────────
+   The landing page's own token sheet, copied rather than referenced:
+   site/ ships no shared stylesheet, and every page here is standalone
+   for the same reason every file the skill makes is. Any change to a
+   token belongs in both files. */
+:root {
+  --bg: #15160f;            /* near-black olive */
+  --bg-lift: #1c1d15;
+  --sage: #7a7f6c;
+  --sage-deep: #4c5142;
+  --cream: #ece9dd;
+  --cream-dim: color-mix(in srgb, var(--cream) 62%, transparent);
+  --cream-faint: color-mix(in srgb, var(--cream) 34%, transparent);
+  --rust: #b0492e;
+  --terracotta: #d29873;
+  --frame: #ffffff;
+  --hair: color-mix(in srgb, var(--cream) 16%, transparent);
+  --hair-strong: color-mix(in srgb, var(--cream) 30%, transparent);
+  --font-display: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --measure: 62ch;
+  --pad: clamp(20px, 5vw, 64px);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+::selection { background: var(--terracotta); color: var(--bg); }
+
+/* ── atmosphere: blurred blooms + film grain ───────────────────── */
+.atmosphere {
+  position: fixed; inset: 0; z-index: -2; overflow: hidden;
+  background:
+    radial-gradient(52vw 44vw at 78% 30%, color-mix(in srgb, var(--rust) 34%, transparent), transparent 62%),
+    radial-gradient(40vw 36vw at 66% 60%, color-mix(in srgb, var(--terracotta) 16%, transparent), transparent 60%),
+    radial-gradient(70vw 55vw at 18% 82%, color-mix(in srgb, var(--sage-deep) 52%, transparent), transparent 68%),
+    radial-gradient(46vw 40vw at 8% 12%, color-mix(in srgb, var(--sage) 20%, transparent), transparent 60%),
+    var(--bg);
+  filter: saturate(0.92);
+}
+.grain {
+  position: fixed; inset: -50%; z-index: -1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.055;
+  animation: grain 9s steps(6) infinite;
+}
+@keyframes grain {
+  0%,100% { transform: translate(0,0); } 20% { transform: translate(-2%,3%); }
+  40% { transform: translate(3%,-2%); } 60% { transform: translate(-3%,-3%); }
+  80% { transform: translate(2%,2%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── type ──────────────────────────────────────────────────────── */
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.015em; line-height: 1.08; }
+.kicker {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--cream-dim);
+}
+.rule { width: 88px; height: 1px; background: var(--cream); opacity: 0.85; border: 0; }
+a { color: inherit; }
+code { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ── topbar ────────────────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 18px var(--pad);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--hair);
+}
+.wordmark { display: flex; align-items: center; gap: 14px; }
+.wordmark a { text-decoration: none; display: flex; align-items: center; }
+.wordmark img { width: 30px; height: 30px; display: block; }
+.wordmark span {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--cream);
+}
+.topnav { display: flex; align-items: center; gap: clamp(14px, 3vw, 32px); }
+.topnav a {
+  font-size: 13px; text-decoration: none; color: var(--cream-dim);
+  transition: color 200ms var(--ease);
+}
+.topnav a:hover { color: var(--cream); }
+.topnav .gh {
+  color: var(--cream); border: 1px solid var(--hair-strong);
+  padding: 8px 16px; border-radius: 9999px;
+  transition: border-color 200ms var(--ease), background 200ms var(--ease);
+}
+.topnav .gh:hover { border-color: var(--cream); background: color-mix(in srgb, var(--cream) 8%, transparent); }
+@media (max-width: 640px) { .topnav a:not(.gh) { display: none; } }
+
+/* ── language switch (Google Translate, cookie-driven) ─────────── */
+.lang { position: relative; }
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--cream-dim); background: transparent;
+  border: 1px solid var(--hair-strong); border-radius: 9999px; padding: 8px 14px;
+  transition: color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.lang-btn:hover, .lang-btn[aria-expanded="true"] { color: var(--cream); border-color: var(--cream); }
+.lang-panel[hidden] { display: none; }
+.lang-panel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 60;
+  width: 240px; max-height: 340px; display: flex; flex-direction: column;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--hair-strong); box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.lang-search {
+  font-family: var(--font-display); font-size: 13px; color: var(--cream);
+  background: transparent; border: 0; border-bottom: 1px solid var(--hair);
+  padding: 12px 14px; outline: none;
+}
+.lang-search::placeholder { color: var(--cream-faint); }
+.lang-list { overflow-y: auto; padding: 6px; }
+.lang-list .lg {
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--cream-faint); padding: 8px 10px 4px;
+}
+.lang-list button {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  width: 100%; text-align: left; cursor: pointer; background: transparent; border: 0;
+  font-family: var(--font-display); font-size: 13.5px; color: var(--cream-dim);
+  padding: 8px 10px; border-radius: 8px;
+  transition: background 160ms var(--ease), color 160ms var(--ease);
+}
+.lang-list button:hover { background: color-mix(in srgb, var(--cream) 8%, transparent); color: var(--cream); }
+.lang-list button.active { color: var(--terracotta); }
+.lang-list button .code { font-family: var(--font-mono); font-size: 10px; color: var(--cream-faint); }
+/* Google Translate chrome stays off the page */
+#google_translate_element { display: none; }
+iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf, .VIpgJd-ZVi9od-ORHb-OEVmcd {
+  display: none !important; visibility: hidden !important;
+}
+body { top: 0 !important; }
+html.translated-ltr .nt-term, html.translated-rtl .nt-term { margin-inline: 0.15em; }
+
+/* ── hero ──────────────────────────────────────────────────────── */
+.hero {
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(32px, 5vw, 72px); align-items: center;
+  padding: clamp(56px, 10vh, 120px) var(--pad) clamp(64px, 10vh, 120px);
+  max-width: 1280px; margin: 0 auto;
+}
+.hero h1 {
+  font-size: clamp(46px, 7vw, 88px); font-weight: 800; color: var(--cream);
+}
+.hero .rule { margin: 28px 0; }
+.hero .tagline {
+  font-size: clamp(15px, 1.6vw, 18px); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--cream-dim); line-height: 1.8;
+  max-width: 40ch;
+}
+.hero .tagline strong { color: var(--cream); font-weight: 700; }
+.hero .sub {
+  margin-top: 22px; color: var(--cream-dim); max-width: 48ch; font-size: 16px;
+}
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  text-decoration: none; border-radius: 9999px; padding: 15px 28px;
+  cursor: pointer; border: 1px solid transparent;
+  transition: transform 240ms var(--ease), background 200ms var(--ease),
+              border-color 200ms var(--ease), color 200ms var(--ease);
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--cream); color: #1c1d15; }
+.btn-primary:hover { background: #ffffff; }
+.btn-ghost { border-color: var(--hair-strong); color: var(--cream); background: transparent; }
+.btn-ghost:hover { border-color: var(--cream); }
+.hero-art { display: flex; justify-content: center; }
+@media (max-width: 880px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-art { justify-content: flex-start; }
+}
+
+/* ── shared section shell ──────────────────────────────────────── */
+section { padding: clamp(64px, 10vh, 128px) var(--pad); }
+.shell { max-width: 1280px; margin: 0 auto; }
+.section-head { max-width: var(--measure); margin-bottom: clamp(36px, 6vh, 64px); }
+.section-head h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+.section-head p { color: var(--cream-dim); }
+.band { border-top: 1px solid var(--hair); }
+.band-lift { background: color-mix(in srgb, var(--bg-lift) 55%, transparent); }
+.note { margin-top: 26px; font-size: 13.5px; color: var(--cream-faint); max-width: var(--measure); }
+
+/* ── the file card ─────────────────────────────────────────────── */
+.file-card {
+  width: clamp(240px, 26vw, 320px); border: 9px solid var(--frame);
+  background: #101109; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  font-family: var(--font-mono); padding: 28px 26px;
+}
+.file-card .fname { font-size: 15px; color: var(--cream); font-weight: 500; }
+.file-card hr { border: 0; height: 1px; background: var(--hair-strong); margin: 14px 0 16px; }
+.file-card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.file-card li { font-size: 12px; color: var(--cream-dim); display: flex; justify-content: space-between; gap: 12px; }
+.file-card li b { color: var(--terracotta); font-weight: 500; }
+
+/* ── the two-column comparison ─────────────────────────────────────
+   The hairline-grid device the landing page uses for its feature grid
+   and its three-step track, at two columns: the claim on this page is a
+   contrast, so the two sides are laid side by side and read across. On
+   one column they stack, and the headings keep them apart. */
+.compare {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+  background: var(--hair); border: 1px solid var(--hair);
+}
+@media (max-width: 880px) { .compare { grid-template-columns: 1fr; } }
+.compare-col { background: var(--bg); padding: clamp(24px, 3vw, 40px); }
+.compare-col .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); letter-spacing: 0.1em; }
+.compare-col h3 { font-size: 18px; margin: 14px 0 4px; }
+.getlist { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+.getlist li { display: flex; gap: 12px; font-size: 14px; color: var(--cream-dim); }
+.getlist li::before { content: "—"; color: var(--terracotta); flex: none; }
+.getlist b { color: var(--cream); font-weight: 700; }
+
+/* ── install steps ─────────────────────────────────────────────── */
+.install-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
+@media (max-width: 880px) { .install-grid { grid-template-columns: 1fr; } }
+.cmdstep { margin-bottom: 26px; }
+.cmdstep .lbl { display: flex; gap: 14px; align-items: baseline; margin-bottom: 10px; }
+.cmdstep .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); }
+.cmdstep b { font-size: 15px; }
+.cmdstep .why { font-size: 13px; color: var(--cream-dim); margin: 4px 0 10px 30px; }
+.cmd {
+  position: relative; border: 1px solid var(--hair-strong); background: #101109;
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.7;
+  padding: 16px 90px 16px 18px; color: var(--cream);
+  white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: auto;
+}
+.copybtn {
+  position: absolute; top: 12px; right: 12px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700;
+  background: var(--cream); color: #1c1d15; border: 0; border-radius: 9999px;
+  padding: 7px 16px; cursor: pointer; transition: background 200ms var(--ease);
+}
+.copybtn:hover { background: #fff; }
+.copybtn.done { background: var(--terracotta); color: #fff; }
+.gen-side h3 { font-size: 20px; margin-bottom: 10px; }
+.gen-side > p { font-size: 14.5px; color: var(--cream-dim); max-width: 46ch; }
+.agents { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.agents span {
+  font-family: var(--font-mono); font-size: 11px; color: var(--cream-dim);
+  border: 1px solid var(--hair); border-radius: 9999px; padding: 5px 12px;
+}
+
+/* ── the three-step track ──────────────────────────────────────── */
+.flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--hair); border: 1px solid var(--hair); }
+@media (max-width: 880px) { .flow { grid-template-columns: 1fr; } }
+.flow-step { background: var(--bg); padding: clamp(22px, 3vw, 36px); display: flex; flex-direction: column; gap: 10px; }
+.flow-step .n { font-family: var(--font-mono); font-size: 12px; color: var(--terracotta); }
+.flow-step h3 { font-size: 17px; }
+.flow-step p { font-size: 13.5px; color: var(--cream-dim); flex: 1; }
+
+/* ── closing band ──────────────────────────────────────────────── */
+.repo-copy { max-width: var(--measure); }
+.repo-copy h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+.repo-copy p { color: var(--cream-dim); }
+.repo-copy .cta-row { margin-top: 30px; }
+.backlink {
+  align-self: center; font-size: 13.5px; color: var(--cream-dim);
+  text-underline-offset: 4px; text-decoration-color: var(--hair-strong);
+  transition: color 200ms var(--ease), text-decoration-color 200ms var(--ease);
+}
+.backlink:hover { color: var(--cream); text-decoration-color: var(--cream); }
+
+/* ── footer ────────────────────────────────────────────────────── */
+footer { border-top: 1px solid var(--hair); padding: 48px var(--pad) 64px; }
+.foot { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; }
+.foot .left { display: flex; align-items: center; gap: 14px; }
+.foot img { width: 24px; height: 24px; }
+.foot span, .foot a { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-faint); text-decoration: none; }
+.foot a:hover { color: var(--cream); }
+</style>
+</head>
+<body>
+
+<div class="atmosphere" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="wordmark">
+    <a href="https://monomind.one/?ref=tedlisa-mark" rel="noopener" aria-label="MonoMind">
+      <img src="assets/monomind-mark-solid-white.svg" alt="MonoMind"></a>
+    <a href="/" aria-label="Hi Ted, Meet Lisa — home"><span>Hi Ted, Meet Lisa</span></a>
+  </div>
+  <!-- Three links back, not the landing page's four. Its "Try it" and
+       "Install" both aim at #paths and are told apart by the tab they
+       select once they get there, which is a same-page gesture this page
+       cannot make; one link to #paths is the honest version of both. The
+       GitHub button stays pointed at Hi Ted, Meet Lisa, whose name the
+       wordmark carries — Lisa's PPT has its own repository link, twice,
+       in the page itself. -->
+  <nav class="topnav" aria-label="Primary">
+    <a href="/#paths">Try it</a>
+    <a href="/#templates">Templates</a>
+    <a href="/#for-teams">For teams</a>
+    <div class="lang" id="lang">
+      <button class="lang-btn" id="lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+        <span id="lang-cur">EN</span>
+      </button>
+      <div class="lang-panel" id="lang-panel" hidden>
+        <input class="lang-search" id="lang-search" type="search" placeholder="Search languages…" aria-label="Search languages">
+        <div class="lang-list" id="lang-list" role="listbox" aria-label="Languages"></div>
+      </div>
+    </div>
+    <a class="gh" href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ── hero ─────────────────────────────────────────────────── -->
+  <div class="hero">
+    <div>
+      <p class="kicker">An affiliated product</p>
+      <h1 class="notranslate" translate="no">Lisa's PPT</h1>
+      <hr class="rule">
+      <p class="tagline">PowerPoint, not <strong>HTML</strong></p>
+      <p class="sub">Everything else on this site is one standalone HTML file. This is
+      the exception — a separate plugin you install yourself, which hands your agent a
+      real, editable <code>.pptx</code> carrying the same house style. Nothing here
+      builds it and nothing here hosts it; this page is where it is explained, and the
+      repository is one link away.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#install">Install it</a>
+        <a class="btn btn-ghost" href="https://github.com/monomind-ai-lab/lisa-ppt" rel="noopener">The repository ↗</a>
+      </div>
+    </div>
+    <!-- The landing page's file card, carrying the other format. It is the
+         same device making the same point in one glance, and like that one
+         it is literal throughout — mono, lowercase, no prose — so it is
+         read rather than translated. -->
+    <div class="hero-art" aria-hidden="true">
+      <div class="file-card">
+        <div class="fname">deck.pptx</div>
+        <hr>
+        <ul>
+          <li>format <b>.pptx</b></li>
+          <li>opens in <b>PowerPoint</b></li>
+          <li>editable <b>yes</b></li>
+          <li>stage <b>16:9</b></li>
+          <li>brand pack <b>brands/monomind</b></li>
+          <li>built by <b>/lisa-ppt</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── the difference ───────────────────────────────────────── -->
+  <section class="band band-lift" id="different" aria-labelledby="diff-h">
+    <div class="shell">
+      <div class="section-head">
+        <p class="kicker">The difference</p>
+        <h2 id="diff-h">The one thing here that is not an HTML file.</h2>
+        <p>Ted and Lisa make web pages. Lisa's PPT makes a PowerPoint. Same house
+        style, different medium — and the medium brings its own rules with it.</p>
+      </div>
+      <div class="compare">
+        <div class="compare-col">
+          <span class="n">↔ REFLOW</span>
+          <h3>Everything else here</h3>
+          <ul class="getlist">
+            <li><span><b>One <code>.html</code> file.</b> Double-click it, email it,
+            drop it on any static host. Your reader installs nothing.</span></li>
+            <li><span><b>Two languages in one file.</b> English plus Korean or
+            Traditional Chinese, written inline and switched in place.</span></li>
+            <li><span><b>Previewed on this site.</b> Every card in the gallery opens
+            a real generated file, not a mockup.</span></li>
+            <li><span><b>Nothing to install.</b> Any coding agent can read the skill
+            straight from a public URL.</span></li>
+          </ul>
+        </div>
+        <div class="compare-col">
+          <span class="n">▭ STAGE</span>
+          <h3 class="notranslate" translate="no">Lisa's PPT</h3>
+          <ul class="getlist">
+            <li><span><b>One <code>.pptx</code> file.</b> A fixed 16:9 stage that
+            opens in PowerPoint or Keynote — and whoever receives it edits it
+            there.</span></li>
+            <li><span><b>One language per file.</b> PowerPoint carries no language
+            switch, so a deck is built in the language you asked for.</span></li>
+            <li><span><b>No preview here.</b> This site builds nothing for it and
+            hosts nothing of it, so there is nothing to open.</span></li>
+            <li><span><b>Installed on its own.</b> A separate plugin from a separate
+            repository, added to your agent by you.</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">Both are made by MonoMind AI Lab, and both put the same brand on
+      the page. They are not the same product, and this page exists so the gallery
+      does not have to pretend otherwise.</p>
+    </div>
+  </section>
+
+  <!-- ── install ──────────────────────────────────────────────── -->
+  <section class="band" id="install" aria-labelledby="install-h">
+    <div class="shell">
+      <div class="section-head">
+        <p class="kicker">Install</p>
+        <h2 id="install-h">Two commands, once.</h2>
+        <p>Lisa's PPT is a plugin, installed the way any other plugin is. Run these
+        two in this order, and <code>/lisa-ppt</code> becomes a standing command.</p>
+      </div>
+      <div class="install-grid">
+        <div>
+          <div class="cmdstep">
+            <div class="lbl"><span class="n">01</span><b>Add the marketplace</b></div>
+            <p class="why">The repository is its own marketplace, so this is the step
+            where your agent learns the plugin exists.</p>
+            <div class="cmd" id="cmd-marketplace">/plugin marketplace add monomind-ai-lab/lisa-ppt<button class="copybtn" data-copy="cmd-marketplace" type="button">Copy</button></div>
+          </div>
+          <div class="cmdstep">
+            <div class="lbl"><span class="n">02</span><b>Install the plugin</b></div>
+            <p class="why">Installed once, available in every project. Other agents
+            have their own plugin directory — the layout is the same.</p>
+            <div class="cmd" id="cmd-install">/plugin install lisa-ppt@monomind-ppt<button class="copybtn" data-copy="cmd-install" type="button">Copy</button></div>
+          </div>
+        </div>
+        <div class="gen-side">
+          <h3>Where they run</h3>
+          <p>Both lines are typed at your agent, not in a terminal. The wording is
+          Claude Code's; other agents install a plugin their own way, from the same
+          repository.</p>
+          <div class="agents">
+            <span>Claude Code</span><span>Codex</span><span>Gemini CLI</span><span>OpenCode</span>
+          </div>
+        </div>
+      </div>
+      <p class="note">Those two lines are commands, not prose. They are never
+      translated, whatever language this page is switched to — a mistranslated
+      command is a command that does not run.</p>
+    </div>
+  </section>
+
+  <!-- ── the workflow ─────────────────────────────────────────── -->
+  <section class="band band-lift" id="workflow" aria-labelledby="flow-h">
+    <div class="shell">
+      <div class="section-head">
+        <p class="kicker">The workflow</p>
+        <h2 id="flow-h">Brief it, and it builds the deck.</h2>
+        <p>Nothing new to learn if you have used <code>/lisa</code>. It asks for the
+        same brief and it applies the same brand — it just ends somewhere else.</p>
+      </div>
+      <div class="flow">
+        <div class="flow-step">
+          <span class="n">01</span>
+          <h3>Tell it what the deck is for</h3>
+          <p>The same brief Lisa takes: what this is about, who it is for, what it has
+          to do when it lands. Those answers are its own first stage.</p>
+        </div>
+        <div class="flow-step">
+          <span class="n">02</span>
+          <h3>It builds in the house style</h3>
+          <p>The MonoMind brand pack ships with it, so the deck comes out looking like
+          everything else here without you supplying a single token.</p>
+        </div>
+        <div class="flow-step">
+          <span class="n">03</span>
+          <h3>You get a <code>.pptx</code></h3>
+          <p>Open it, edit it, send it. From that point it is a PowerPoint file like
+          any other, and this site is not involved in it at all.</p>
+        </div>
+      </div>
+      <p class="note">Every step above happens in your own agent, on your own machine.
+      This site describes the plugin; it does not run it, and it never sees the deck.</p>
+    </div>
+  </section>
+
+  <!-- ── where it lives ───────────────────────────────────────── -->
+  <section class="band" id="repository" aria-labelledby="repo-h">
+    <div class="shell">
+      <div class="repo-copy">
+        <p class="kicker">Where it lives</p>
+        <h2 id="repo-h">A separate repository, from the same lab.</h2>
+        <p>Lisa's PPT is built and maintained by MonoMind AI Lab alongside Hi Ted,
+        Meet Lisa — but it is not part of it. A different repository, a different
+        plugin, a different output format. Read it, open an issue, or fork it there.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/monomind-ai-lab/lisa-ppt" rel="noopener">Open the repository ↗</a>
+          <a class="backlink" href="/#templates">Back to the templates</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot">
+    <a class="left" href="https://monomind.one/?ref=tedlisa-footer" rel="noopener">
+      <img src="assets/monomind-mark-solid-white.svg" alt="">
+      <span>MonoMind AI Lab</span>
+    </a>
+    <div style="display:flex; gap:24px;">
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa" rel="noopener">GitHub</a>
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/skills/lisa/SKILL.md" rel="noopener">The skill</a>
+      <a href="https://github.com/monomind-ai-lab/hi-ted-meet-lisa/blob/main/LICENSE" rel="noopener">MIT + Commons Clause</a>
+      <a href="/#for-teams">For teams</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  /* ---- copy buttons -----------------------------------------------
+     The landing page's handler, unchanged: `data-copy` names the block
+     whose text to lift, and the trailing "Copy" of the button itself is
+     stripped back off. */
+  Array.prototype.forEach.call(document.querySelectorAll(".copybtn"), function (btn) {
+    btn.addEventListener("click", function () {
+      var text = btn.getAttribute("data-copy-raw");
+      if (!text) {
+        var src = document.getElementById(btn.getAttribute("data-copy"));
+        text = src.innerText.replace(/Copy\s*$/, "").trim();
+      }
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = "Copied";
+        btn.classList.add("done");
+        setTimeout(function () {
+          btn.textContent = "Copy";
+          btn.classList.remove("done");
+        }, 1800);
+      });
+    });
+  });
+})();
+</script>
+
+<div id="google_translate_element"></div>
+<script>
+/* Language switch — the landing page's block, carrying this page's own
+   strings. The mechanism is shared on purpose: the same three instant
+   languages, the same `tedandlisa-lang` key in localStorage (so a reader
+   who picked Korean on the landing page arrives here in Korean), the same
+   machine-translated tail behind Google Translate, and the same protection
+   for anything that is a file name, a command, or a product name. */
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    { pageLanguage: 'en', autoDisplay: false },
+    'google_translate_element'
+  );
+}
+(function () {
+  "use strict";
+  var PREFERRED = [
+    ['en', 'English'], ['ko', '한국어'], ['zh-TW', '繁體中文']
+  ];
+  var OTHERS = [
+    ['ja','日本語'], ['zh-CN','简体中文'], ['es','Español'], ['fr','Français'],
+    ['de','Deutsch'], ['it','Italiano'], ['pt','Português'], ['ru','Русский'],
+    ['ar','العربية'], ['hi','हिन्दी'], ['th','ไทย'], ['vi','Tiếng Việt'],
+    ['id','Bahasa Indonesia'], ['ms','Bahasa Melayu'], ['tr','Türkçe'],
+    ['nl','Nederlands'], ['pl','Polski'], ['sv','Svenska'], ['da','Dansk'],
+    ['no','Norsk'], ['fi','Suomi'], ['cs','Čeština'], ['el','Ελληνικά'],
+    ['he','עברית'], ['uk','Українська'], ['ro','Română'], ['hu','Magyar'],
+    ['bg','Български'], ['hr','Hrvatski'], ['sk','Slovenčina'], ['bn','বাংলা'],
+    ['ta','தமிழ்'], ['te','తెలుగు'], ['fa','فارسی'], ['ur','اردو'],
+    ['tl','Filipino'], ['sw','Kiswahili'], ['mn','Монгол'], ['km','ខ្មែរ'],
+    ['lo','ລາວ'], ['my','မြန်မာ']
+  ];
+
+  /* ── inline translations ──────────────────────────────────────
+     Entries are [selector, ko, zh-TW, all?]; English is whatever the DOM
+     already holds, cached on first switch.
+
+     Nothing here is positional. The landing page's gallery has entries
+     keyed on `.gallery .card:nth-child(N)` and pays for it every time a
+     card is added; this page starts clean, so every selector is an id, a
+     class, or a structural path that a new section between two others
+     cannot renumber.
+
+     Two things are deliberately absent, and both are absences rather than
+     oversights. The install commands have no entry — D-030: a command is
+     never translated, and `.cmd` is in LITERAL_BLOCKS below so the machine
+     translator cannot reach them either. And "Lisa's PPT" has no entry
+     wherever it stands alone as a heading: it is a product name, and it
+     reads the same in all three. */
+  var INLINE = { en: 1, ko: 1, 'zh-TW': 1 };
+  var T = [
+    ['.topnav a[href="/#paths"]', '써보기', '試試看'],
+    ['.topnav a[href="/#templates"]', '템플릿', '範本'],
+    ['.topnav a[href="/#for-teams"]', '팀을 위해', '團隊方案'],
+
+    ['.hero .kicker', '제휴 제품', '合作產品'],
+    ['.hero .tagline', 'HTML이 아니라 <strong>PowerPoint</strong>', '是 <strong>PowerPoint</strong>，不是 HTML'],
+    ['.hero .sub', '이 사이트의 다른 모든 것은 독립 실행형 HTML 파일 하나입니다. 이것만 예외입니다 — 직접 설치하는 별도의 플러그인이며, 같은 하우스 스타일을 담은 편집 가능한 진짜 <code>.pptx</code>를 에이전트가 건네줍니다. 여기서 만들어 주는 것도, 호스팅하는 것도 없습니다. 이 페이지는 그것이 무엇인지 설명하는 자리이고, 저장소는 링크 하나 거리에 있습니다.', '這個網站上的其他一切都是一個獨立的 HTML 檔案。只有它是例外 — 一個要自行安裝的獨立外掛，會讓你的 agent 交回一個可編輯的真實 <code>.pptx</code>，帶著同一套視覺系統。這裡不會產生它，也不會託管它；這一頁是說明它是什麼的地方，儲存庫就在一個連結之外。'],
+    ['.hero .cta-row .btn-primary', '설치하기', '安裝它'],
+    ['.hero .cta-row .btn-ghost', '저장소 ↗', '儲存庫 ↗'],
+
+    ['#different .kicker', '차이점', '差別'],
+    ['#diff-h', '여기서 HTML 파일이 아닌 단 하나.', '這裡唯一不是 HTML 檔的東西。'],
+    ['#different .section-head p:not(.kicker)', 'Ted와 Lisa는 웹 페이지를 만듭니다. Lisa’s PPT는 PowerPoint를 만듭니다. 같은 하우스 스타일, 다른 매체 — 그리고 매체가 바뀌면 규칙도 함께 바뀝니다.', 'Ted 和 Lisa 做的是網頁，Lisa’s PPT 做的是 PowerPoint。同一套視覺系統，不同的媒介 — 媒介換了，規則也跟著換。'],
+    ['.compare-col:nth-child(1) .n', '↔ 리플로우', '↔ 重排'],
+    ['.compare-col:nth-child(1) h3', '여기 있는 다른 모든 것', '這裡的其他一切'],
+    ['.compare-col:nth-child(1) .getlist li:nth-child(1) > span', '<b><code>.html</code> 파일 하나.</b> 더블클릭하고, 이메일로 보내고, 아무 정적 호스트에나 올리세요. 읽는 사람은 아무것도 설치하지 않습니다.', '<b>一個 <code>.html</code> 檔。</b>雙擊、寄出、丟上任何靜態主機都行。你的讀者什麼都不用安裝。'],
+    ['.compare-col:nth-child(1) .getlist li:nth-child(2) > span', '<b>한 파일에 두 언어.</b> 영어와 한국어(또는 번체 중국어)가 본문에 함께 담겨, 그 자리에서 전환됩니다.', '<b>一個檔案兩種語言。</b>英文加上韓文或繁體中文直接寫在內文，原地切換。'],
+    ['.compare-col:nth-child(1) .getlist li:nth-child(3) > span', '<b>이 사이트에서 미리보기.</b> 갤러리의 모든 카드는 목업이 아니라 실제로 생성된 파일을 엽니다.', '<b>在這個網站上預覽。</b>圖庫裡每張卡片打開的都是真正生成的檔案，不是示意圖。'],
+    ['.compare-col:nth-child(1) .getlist li:nth-child(4) > span', '<b>설치할 것 없음.</b> 어떤 코딩 에이전트든 공개 URL에서 스킬을 바로 읽을 수 있습니다.', '<b>不用安裝任何東西。</b>任何 coding agent 都能直接從公開網址讀取這個技能。'],
+    ['.compare-col:nth-child(2) .n', '▭ 스테이지', '▭ 舞台'],
+    ['.compare-col:nth-child(2) .getlist li:nth-child(1) > span', '<b><code>.pptx</code> 파일 하나.</b> PowerPoint나 Keynote에서 열리는 고정 16:9 스테이지 — 받은 사람이 거기서 편집합니다.', '<b>一個 <code>.pptx</code> 檔。</b>固定 16:9 舞台，在 PowerPoint 或 Keynote 裡打開 — 收到的人就在那裡編輯。'],
+    ['.compare-col:nth-child(2) .getlist li:nth-child(2) > span', '<b>파일당 한 언어.</b> PowerPoint에는 언어 전환이 없으므로, 덱은 요청한 언어로 만들어집니다.', '<b>一個檔案一種語言。</b>PowerPoint 沒有語言切換，所以 deck 會用你指定的語言建構。'],
+    ['.compare-col:nth-child(2) .getlist li:nth-child(3) > span', '<b>여기에는 미리보기가 없습니다.</b> 이 사이트는 그것을 만들지도, 호스팅하지도 않으므로 열 것이 없습니다.', '<b>這裡沒有預覽。</b>這個網站不產生它、也不託管它，所以沒有東西可以打開。'],
+    ['.compare-col:nth-child(2) .getlist li:nth-child(4) > span', '<b>따로 설치합니다.</b> 별도 저장소의 별도 플러그인이며, 직접 에이전트에 추가합니다.', '<b>自行安裝。</b>來自另一個儲存庫的另一個外掛，由你親手加進你的 agent。'],
+    ['#different .note', '둘 다 MonoMind AI Lab이 만들고, 둘 다 같은 브랜드를 화면에 올립니다. 그렇다고 같은 제품은 아닙니다 — 이 페이지가 있는 이유는 갤러리가 같은 척하지 않아도 되도록 하기 위해서입니다.', '兩者都出自 MonoMind AI Lab，也都把同一套品牌放上畫面。但它們不是同一個產品 — 這一頁存在，就是為了讓圖庫不必假裝它們是。'],
+
+    ['#install .kicker', '설치', '安裝'],
+    ['#install-h', '명령어 두 줄, 한 번이면 됩니다.', '兩行指令，一次就好。'],
+    ['#install .section-head p:not(.kicker)', 'Lisa’s PPT는 플러그인이며, 다른 플러그인과 똑같이 설치합니다. 아래 두 줄을 순서대로 실행하면 <code>/lisa-ppt</code>가 상시 명령이 됩니다.', 'Lisa’s PPT 是一個外掛，安裝方式和其他外掛一樣。依序執行下面兩行，<code>/lisa-ppt</code> 就成為常駐指令。'],
+    ['.cmdstep:nth-child(1) b', '마켓플레이스 추가하기', '加入 marketplace'],
+    ['.cmdstep:nth-child(1) .why', '저장소 자체가 마켓플레이스입니다. 에이전트가 이 플러그인의 존재를 알게 되는 단계입니다.', '這個儲存庫本身就是一個 marketplace — 這一步是讓你的 agent 知道有這個外掛。'],
+    ['.cmdstep:nth-child(2) b', '플러그인 설치하기', '安裝外掛'],
+    ['.cmdstep:nth-child(2) .why', '한 번 설치하면 모든 프로젝트에서 쓸 수 있습니다. 다른 에이전트도 각자의 플러그인 디렉터리가 있고, 구조는 같습니다.', '安裝一次，每個專案都能用。其他 agent 有自己的外掛目錄 — 結構是一樣的。'],
+    ['.gen-side h3', '어디서 실행하나요', '在哪裡執行'],
+    ['.gen-side > p', '두 줄 모두 터미널이 아니라 에이전트에게 입력합니다. 문구는 Claude Code의 것이며, 다른 에이전트는 같은 저장소에서 각자의 방식으로 플러그인을 설치합니다.', '這兩行都是打給你的 agent，不是打在終端機裡。用詞是 Claude Code 的；其他 agent 會用自己的方式，從同一個儲存庫安裝。'],
+    ['#install .note', '그 두 줄은 산문이 아니라 명령어입니다. 이 페이지를 어떤 언어로 바꾸든 번역되지 않습니다 — 잘못 번역된 명령어는 실행되지 않는 명령어니까요.', '那兩行是指令，不是文字。不論這一頁切換到什麼語言，它們都不會被翻譯 — 被翻壞的指令就是跑不起來的指令。'],
+
+    ['#workflow .kicker', '작업 흐름', '運作流程'],
+    ['#flow-h', '브리핑하면, 덱을 만들어 줍니다.', '給它一份 brief，它就把 deck 做出來。'],
+    ['#workflow .section-head p:not(.kicker)', '<code>/lisa</code>를 써 보셨다면 새로 배울 것은 없습니다. 같은 브리프를 묻고 같은 브랜드를 입힙니다 — 끝나는 곳만 다릅니다.', '如果你用過 <code>/lisa</code>，就沒有新東西要學。它問同一份 brief、套同一套品牌 — 只是結束在別的地方。'],
+    ['.flow-step:nth-child(1) h3', '덱이 무엇을 위한 것인지 알려주세요', '告訴它這份 deck 要做什麼'],
+    ['.flow-step:nth-child(1) p', 'Lisa가 받는 것과 같은 브리프입니다: 무엇에 대한 것인지, 누구를 위한 것인지, 도착했을 때 무엇을 해야 하는지. 그 답변이 첫 단계가 됩니다.', '和 Lisa 收到的是同一份 brief：這是關於什麼、給誰看、送到對方手上時要達成什麼。那些答案就是它的第一階段。'],
+    ['.flow-step:nth-child(2) h3', '하우스 스타일로 만듭니다', '以 house style 建構'],
+    ['.flow-step:nth-child(2) p', 'MonoMind 브랜드 팩이 함께 제공되므로, 토큰을 하나도 넘기지 않아도 여기 있는 다른 결과물과 같은 모습으로 나옵니다.', 'MonoMind 品牌包隨附，所以你一個 token 都不用給，做出來的 deck 就和這裡的其他成品長得一樣。'],
+    ['.flow-step:nth-child(3) h3', '<code>.pptx</code> 파일을 받습니다', '你會拿到一個 <code>.pptx</code>'],
+    ['.flow-step:nth-child(3) p', '열고, 고치고, 보내세요. 그 시점부터는 다른 PowerPoint 파일과 똑같으며, 이 사이트는 전혀 관여하지 않습니다.', '打開它、修改它、寄出去。從那一刻起它就和其他 PowerPoint 檔沒有兩樣，這個網站完全不介入。'],
+    ['#workflow .note', '위의 모든 단계는 당신의 에이전트 안에서, 당신의 컴퓨터에서 일어납니다. 이 사이트는 플러그인을 설명할 뿐 실행하지 않으며, 덱을 보지도 않습니다.', '上面每一步都發生在你自己的 agent、你自己的機器上。這個網站只描述這個外掛，不會執行它，也看不到那份 deck。'],
+
+    ['#repository .kicker', '어디에 있나', '它住在哪裡'],
+    ['#repo-h', '같은 랩이 만든, 별도의 저장소.', '同一個實驗室，另一個儲存庫。'],
+    ['.repo-copy > p:not(.kicker)', 'Lisa’s PPT는 MonoMind AI Lab이 Hi Ted, Meet Lisa와 나란히 만들고 유지합니다 — 다만 그 일부는 아닙니다. 저장소도, 플러그인도, 결과물 형식도 다릅니다. 저장소에서 읽고, 이슈를 남기고, 포크하세요.', 'Lisa’s PPT 由 MonoMind AI Lab 與 Hi Ted, Meet Lisa 並行開發、維護 — 但它不是其中的一部分。不同的儲存庫、不同的外掛、不同的輸出格式。到那裡閱讀、開 issue，或 fork 它。'],
+    ['.repo-copy .btn-primary', '저장소 열기 ↗', '開啟儲存庫 ↗'],
+    ['.backlink', '템플릿으로 돌아가기', '回到範本圖庫']
+  ];
+  var UI = {
+    en: { search: 'Search languages…', instant: 'Instant', mt: 'Machine translated' },
+    ko: { search: '언어 검색…', instant: '즉시', mt: '기계 번역' },
+    'zh-TW': { search: '搜尋語言…', instant: '即時', mt: '機器翻譯' }
+  };
+
+  function applyInline(code) {
+    var idx = code === 'ko' ? 1 : 2;
+    T.forEach(function (e) {
+      var els = e[3] ? document.querySelectorAll(e[0])
+                     : (function (n) { return n ? [n] : []; })(document.querySelector(e[0]));
+      Array.prototype.forEach.call(els, function (el) {
+        if (el.__en === undefined) el.__en = el.innerHTML;
+        el.innerHTML = code === 'en' ? el.__en : e[idx];
+      });
+    });
+    document.documentElement.lang = code === 'zh-TW' ? 'zh-Hant' : code;
+    var ui = UI[code] || UI.en;
+    document.getElementById('lang-search').placeholder = ui.search;
+  }
+
+  /* `.cmd` leads this list for the reason the page says out loud: the two
+     install commands must survive every language, including the machine
+     translated tail. `.file-card` is here for the same reason the landing
+     page has it — the card is literal throughout. */
+  var LITERAL_BLOCKS = '.cmd, code, .file-card, .agents, .lang-panel, .wordmark';
+  /* Case-sensitive by design, longest form first: `monomind.one` must win
+     over the bare `monomind`, or the machine translator gets the `.one`. */
+  var TERMS = /(html\.monomind\.one|monomind\.one|MonoMind(?: AI Lab)?|MONOMIND(?: AI LAB)?|monomind(?: ai lab)?|Hi Ted, Meet Lisa|Claude Code|Gemini CLI|OpenCode|Codex|Hermes|PowerPoint|Keynote|GitHub|\bTed\b|\bLisa\b|\/lisa(?:-[a-z-]+)?|[A-Za-z0-9_.-]+\.(?:html|md|json|pptx)\b)/g;
+  var SKIP = /^(SCRIPT|STYLE|CODE|TEXTAREA|NOSCRIPT|IFRAME)$/;
+
+  function protect() {
+    document.querySelectorAll(LITERAL_BLOCKS).forEach(function (el) {
+      el.setAttribute('translate', 'no');
+      el.classList.add('notranslate');
+    });
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (!node.nodeValue || node.nodeValue.length < 3) return NodeFilter.FILTER_REJECT;
+        var p = node.parentNode;
+        if (!p || SKIP.test(p.nodeName)) return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest('[translate="no"]')) return NodeFilter.FILTER_REJECT;
+        TERMS.lastIndex = 0;
+        return TERMS.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var targets = [], n;
+    while ((n = walker.nextNode())) targets.push(n);
+    targets.forEach(function (node) {
+      var frag = document.createDocumentFragment();
+      var text = node.nodeValue, last = 0, m;
+      TERMS.lastIndex = 0;
+      while ((m = TERMS.exec(text))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+        var span = document.createElement('span');
+        span.className = 'notranslate nt-term';
+        span.setAttribute('translate', 'no');
+        span.textContent = m[0];
+        frag.appendChild(span);
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  function currentLang() {
+    var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : 'en';
+  }
+  /* On a real subdomain (html.monomind.one) googtrans cookies pile up at
+     several scopes — ours plus the one Google's widget sets zone-wide —
+     and the widget chokes on the ambiguity. Kill every scope, then keep a
+     single host-only cookie. */
+  function killCookies() {
+    var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
+    document.cookie = kill;
+    var parts = location.hostname.split('.');
+    for (var i = 0; i < parts.length - 1; i++) {
+      var d = parts.slice(i).join('.');
+      document.cookie = kill + '; domain=' + d;
+      document.cookie = kill + '; domain=.' + d;
+    }
+  }
+  /* The same key the landing page writes, so the choice carries across the
+     link in either direction rather than resetting to English on arrival. */
+  function storedLang() {
+    try { return localStorage.getItem('tedandlisa-lang') || 'en'; }
+    catch (e) { return 'en'; }
+  }
+  function setLang(code) {
+    killCookies();
+    try {
+      if (code === 'en') localStorage.removeItem('tedandlisa-lang');
+      else localStorage.setItem('tedandlisa-lang', code);
+    } catch (e) {}
+    if (INLINE[code]) {
+      /* Instant tier: swap the copy in place — unless the machine
+         translator has already rewritten the DOM, in which case only a
+         clean reload gets the original text back. */
+      if (/translated/.test(document.documentElement.className)) {
+        location.reload();
+        return;
+      }
+      cur = code;
+      applyInline(code);
+      document.getElementById('lang-cur').textContent = code.toUpperCase();
+      announce(code);
+      toggle(false);
+      return;
+    }
+    document.cookie = 'googtrans=/en/' + code + '; path=/';
+    location.reload();
+  }
+
+  /* The landing page uses this event to tell the intake panel in its
+     iframe which language to be in. This page embeds nothing, so nothing
+     listens yet — the event is kept because it is the site's convention
+     for announcing a switch, and a listener added later needs no change
+     here. `__tedandlisaLang` is the same convention read the other way. */
+  function announce(code) {
+    document.dispatchEvent(new CustomEvent('tedandlisa:lang', { detail: code }));
+  }
+  window.__tedandlisaLang = function () { return cur; };
+
+  /* dropdown */
+  var btn = document.getElementById('lang-btn');
+  var panel = document.getElementById('lang-panel');
+  var list = document.getElementById('lang-list');
+  var search = document.getElementById('lang-search');
+  var cur = storedLang();
+  if (cur === 'en') cur = currentLang();
+  if (INLINE[cur]) {
+    killCookies();
+    if (cur !== 'en') applyInline(cur);
+  } else if (cur !== 'en') {
+    killCookies();
+    document.cookie = 'googtrans=/en/' + cur + '; path=/';
+  }
+  document.getElementById('lang-cur').textContent = cur.toUpperCase();
+
+  function row(code, name) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'option');
+    b.setAttribute('data-code', code);
+    b.setAttribute('data-name', name.toLowerCase());
+    if (code === cur) b.classList.add('active');
+    b.innerHTML = '<span>' + name + '</span><span class="code">' + code + '</span>';
+    b.addEventListener('click', function () { setLang(code); });
+    return b;
+  }
+  function render(filter) {
+    list.innerHTML = '';
+    var f = (filter || '').trim().toLowerCase();
+    function matches(code, name) {
+      return !f || name.toLowerCase().indexOf(f) !== -1 || code.toLowerCase().indexOf(f) !== -1;
+    }
+    var pref = PREFERRED.filter(function (l) { return matches(l[0], l[1]); });
+    var rest = OTHERS.filter(function (l) { return matches(l[0], l[1]); });
+    var ui = UI[cur] || UI.en;
+    if (pref.length) {
+      var h1 = document.createElement('div'); h1.className = 'lg'; h1.textContent = ui.instant;
+      list.appendChild(h1);
+      pref.forEach(function (l) { list.appendChild(row(l[0], l[1])); });
+    }
+    if (rest.length) {
+      var h2 = document.createElement('div'); h2.className = 'lg'; h2.textContent = ui.mt;
+      list.appendChild(h2);
+      rest.forEach(function (l) { list.appendChild(row(l[0], l[1])); });
+    }
+  }
+  function toggle(open) {
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    if (open) { render(''); search.value = ''; search.focus(); }
+  }
+  btn.addEventListener('click', function () { toggle(panel.hidden); });
+  search.addEventListener('input', function () { render(search.value); });
+  document.addEventListener('click', function (e) {
+    if (!panel.hidden && !e.target.closest('.lang')) toggle(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !panel.hidden) toggle(false);
+  });
+
+  if (cur !== 'en' && !INLINE[cur]) {
+    protect();
+    /* The document title carries two product names, neither of which may be
+       translated — pin it against Google Translate's rewrite. */
+    var titleEl = document.querySelector('title');
+    var fixedTitle = document.title;
+    if (titleEl) {
+      new MutationObserver(function () {
+        if (document.title !== fixedTitle) document.title = fixedTitle;
+      }).observe(titleEl, { childList: true, subtree: true, characterData: true });
+    }
+    var sc = document.createElement('script');
+    sc.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    document.head.appendChild(sc);
+    /* Belt and braces: after a reload the widget often wakes believing it
+       has already translated while the text is still English, and a
+       same-value change is a no-op. If the text has not changed shortly
+       after load, bounce the hidden select through its restore state and
+       back, which forces a real translation pass. */
+    var probe = document.querySelector('.hero .sub');
+    var original = probe ? probe.textContent : '';
+    [1600, 3800].forEach(function (t) {
+      setTimeout(function () {
+        if (!probe || probe.textContent !== original) return;
+        var sel = document.querySelector('select.goog-te-combo');
+        if (!sel) return;
+        if (sel.value === cur) {
+          sel.value = '';
+          sel.dispatchEvent(new Event('change'));
+          setTimeout(function () {
+            sel.value = cur;
+            sel.dispatchEvent(new Event('change'));
+          }, 350);
+        } else {
+          sel.value = cur;
+          sel.dispatchEvent(new Event('change'));
+        }
+      }, t);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -31,6 +31,7 @@ A minimal working prompt for any coding agent:
 
 - [Intake panel](https://html.monomind.one/intake): answer it in a browser; the last step hands back a complete paste-ready prompt
 - [Live template previews](https://html.monomind.one/#templates): every gallery preview is a real generated file
+- [Lisa's PPT](https://html.monomind.one/lisa-ppt): what the separate PowerPoint product is, how it differs from everything else here, and the two install commands
 
 ## For teams and brands
 
@@ -49,9 +50,10 @@ machinery.
 ## Notes for agents
 
 - Every deliverable of this skill is one standalone .html file; it has no
-  .pptx output. PowerPoint is a separate, install-only repository, Lisa's PPT
+  .pptx output. PowerPoint is a separate, install-only product, Lisa's PPT
   (https://github.com/monomind-ai-lab/lisa-ppt) — nothing on this site builds
-  or hosts it.
+  or hosts it. This site describes it at https://html.monomind.one/lisa-ppt
+  and links the repository from there.
 - Filenames, commands, and product names must never be machine-translated.
 - Output can carry two languages in one file (English plus Korean or
   Traditional Chinese by default).

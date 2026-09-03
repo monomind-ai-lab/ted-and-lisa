@@ -1,5 +1,8 @@
-# site/ is assembled at deploy time by site/sync.sh. Only the five canonical
-# files are tracked: index.html, 404.html, llms.txt, robots.txt, sync.sh.
+# site/ is assembled at deploy time by site/sync.sh. Only the six canonical
+# files are tracked: index.html, lisa-ppt.html, 404.html, llms.txt,
+# robots.txt, sync.sh. The ignores below name assembled artefacts one by
+# one rather than ignoring site/ wholesale, so a new canonical page is
+# tracked the moment it is written.
 site/previews/
 site/intake.html
 site/assets/
