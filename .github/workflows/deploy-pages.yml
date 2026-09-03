@@ -15,8 +15,16 @@
 #
 # Both jobs of the old single repository still hold here: sync.sh fails
 # loudly if the skill checkout is missing or incomplete, and the pre-deploy
-# gate below runs inside that checkout so it checks the panel it is about to
-# ship rather than one from some other commit.
+# gates below run against that checkout so they check the panel and the
+# registry it is about to ship rather than ones from some other commit.
+#
+# There are two of those gates, one per gallery. The intake panel's fallback
+# list is generated, and its check lives in the skill repository. The landing
+# page's gallery is hand-written prose, and its check lives here
+# (scripts/check_gallery.py). A deploy that shipped a gallery missing a
+# template would look fine from the outside — which is exactly how
+# motion-website stayed unreachable for a release wave — so both run before
+# the assembly and either one stops the deploy.
 #
 # One repository secret is required:
 #   CLOUDFLARE_API_TOKEN — a Cloudflare API token with permission
@@ -72,6 +80,15 @@ jobs:
         # from there.
         working-directory: .skill
         run: python3 scripts/tedandlisa_intake_fallback.py --check
+      - name: Check the landing-page gallery against the registry
+        # The other half of the same class of bug. The gallery in
+        # site/index.html is hand-written — its card copy is editorial and
+        # lives in three languages — so a template added upstream gains a
+        # card only when somebody writes one. Fail here rather than deploy a
+        # landing page with no way to reach a template the site is serving.
+        # Runs from the repository root and reads the registry from .skill/,
+        # which is where the checkout above put it.
+        run: python3 scripts/check_gallery.py
       - name: Assemble the deployable site folder
         run: bash site/sync.sh
         env:
