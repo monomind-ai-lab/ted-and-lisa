@@ -11,6 +11,14 @@
 # skips the analytics beacon when it is unset rather than failing or
 # shipping a placeholder — so a fork PR builds identically.
 #
+# Two gates run alongside it. Before the build, scripts/check_gallery.py holds
+# the landing page's hand-written gallery to the skill's template registry:
+# the intake panel is generated from templates/templates.json, but the gallery
+# in site/index.html is prose, so a template can land upstream and have no
+# card — motion-website did, for a whole release wave, its live preview served
+# and reachable only by typing the URL. That gate reads the same .skill/
+# checkout and fails the PR before anything is assembled.
+#
 # After the build, the skill repo's rendered-overflow gate runs over every
 # preview: each file is loaded in headless Chrome (installed by
 # browser-actions/setup-chrome, since ubuntu-latest ships no browser) at
@@ -36,6 +44,11 @@ jobs:
         with:
           repository: monomind-ai-lab/hi-ted-meet-lisa
           path: .skill
+      - name: Check the landing-page gallery against the registry
+        # Runs before the assembly: the registry, the page and the previews
+        # are all canonical as checked out, so a missing card fails here
+        # rather than after a build that would have looked fine.
+        run: python3 scripts/check_gallery.py
       - name: Assemble the deployable site folder
         run: bash site/sync.sh
       - name: Install Chrome for the rendered checks
