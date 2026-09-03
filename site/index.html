@@ -410,6 +410,25 @@ section { padding: clamp(64px, 10vh, 128px) var(--pad); }
 .card .meta p { margin-top: 6px; font-size: 13.5px; color: var(--cream-dim); }
 /* Provenance note under a card that has one — quieter than the body copy. */
 .card .meta p.prov { margin-top: 9px; font-size: 12.5px; color: var(--cream-faint); }
+/* The `layout` axis, carried over from the registry: whether a template
+   re-lays its content out for any width (`reflow`) or is authored on a fixed
+   1920×1080 canvas that scales uniformly and letterboxes on other aspect
+   ratios (`stage`). The hosted intake panel marks every template card with
+   it — `.tlayout` there — and a reader sizing up a preview needs the same
+   fact here, before they click into something that will letterbox on their
+   phone. Deliberately the same voice as the panel's pill: mono, small,
+   muted, hairline outline, no fill, sitting under the copy rather than
+   competing with the name. The wording is the panel's own `layouts` strings
+   in all three inline languages, so the two surfaces cannot drift.
+   A card with no `layout` (the bridge card, which is not a registry entry)
+   simply carries no mark — the panel behaves the same way. */
+.card .meta .layout {
+  display: inline-block; margin-top: 12px;
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.5;
+  color: var(--cream-faint); border: 1px solid var(--hair);
+  border-radius: 999px; padding: 2px 10px;
+}
+.card:hover .meta .layout { border-color: var(--hair-strong); }
 .card.yours .meta p b { color: var(--cream); font-weight: 700; }
 .card:focus-visible { outline: none; }
 .card:focus-visible .frame { outline: 3px solid var(--terracotta); outline-offset: 3px; }
@@ -773,37 +792,43 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           <div class="frame"><img src="previews/monomind-deck.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>MonoMind Deck <span class="kind">slides</span></h3>
           <p>The presentation deck. Horizontal slides, deck menu, keyboard and touch
-          navigation, EN → KR / ZH translation on demand.</p></div>
+          navigation, EN → KR / ZH translation on demand.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/web-document.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/web-document.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Web Document <span class="kind">document</span></h3>
           <p>Hash-routed pages that scroll. Both languages written inline —
-          a bilingual document that reads like a site.</p></div>
+          a bilingual document that reads like a site.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/mermaid-master.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/mermaid-master.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Multi-page Diagrams <span class="kind">diagrams</span></h3>
           <p>Diagram-first slides on light paper. Inline SVG, no CDN,
-          fully offline — even the diagrams translate.</p></div>
+          fully offline — even the diagrams translate.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/architecture.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/architecture.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Architecture <span class="kind">diagram</span></h3>
           <p>System diagrams on slate, colour used semantically. One picture
-          when that is the whole story — or several views of it, switchable.</p></div>
+          when that is the whole story — or several views of it, switchable.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/sitemap-ia.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/sitemap-ia.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Sitemap &amp; IA <span class="kind">proposal</span></h3>
           <p>A site structure argued in pages, ending in a clickable
-          navigation prototype at two breakpoints.</p></div>
+          navigation prototype at two breakpoints.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/project-website.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/project-website.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Project Website <span class="kind">site</span></h3>
           <p>A project's public face — sticky nav, eight hash-routed pages,
-          one shared footer. This very site's sibling.</p></div>
+          one shared footer. This very site's sibling.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <!-- Appended after the seven cards that were already here, and before
              the bridge card below. Several gallery entries in `T` are keyed on
@@ -818,19 +843,22 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           <p>Beyond the house style — twelve style presets and animated slides
           via the companion design pipeline. Still one HTML file.</p>
           <p class="prov">This preview is a real open-source project's deck,
-          rebranded — the same move a private pack makes with yours.</p></div>
+          rebranded — the same move a private pack makes with yours.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/evidence-deck.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/evidence-deck.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Evidence Deck <span class="kind">slides</span></h3>
           <p>Slides that argue from numbers. Vertical scroll-snap on dark
-          ground — data tables with flagged rows, stat rows, verdict bars.</p></div>
+          ground — data tables with flagged rows, stat rows, verdict bars.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card" target="_blank" href="previews/paper-brief.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/paper-brief.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Paper Brief <span class="kind">brief</span></h3>
           <p>A briefing on light paper, paced in chapters. Oversized numbers,
-          bar charts, decision boxes — inverted pages mark the seams.</p></div>
+          bar charts, decision boxes — inverted pages mark the seams.</p>
+          <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
         <a class="card yours" href="#for-teams">
           <div class="frame empty"><span class="yours-hint">your look here</span><span class="open">See how</span></div>
@@ -1425,6 +1453,15 @@ function googleTranslateElementInit() {
     ['.gallery a[href="previews/evidence-deck.html"] .meta p', '숫자로 논증하는 슬라이드. 어두운 바탕에 세로 스크롤 스냅 — 강조된 행이 있는 데이터 표, 수치 행, 판정 바.', '用數字論證的投影片。深色底、垂直捲動吸附 — 會標出重點列的資料表、數據列、結論條。'],
     ['.gallery a[href="previews/paper-brief.html"] .kind', '브리프', '簡報'],
     ['.gallery a[href="previews/paper-brief.html"] .meta p', '밝은 종이 위, 챕터로 끊어 읽는 브리핑. 큼직한 숫자, 막대 차트, 의사결정 박스 — 반전된 페이지가 이음매를 표시합니다.', '淺色紙面上、以章節分段的簡報。放大的數字、長條圖、決策方塊 — 反白頁面標出每一段的接縫。'],
+    /* The layout mark, one entry per value rather than one per card: the
+       selector is the `data-layout` the card itself carries, so it reaches
+       every card with that value and none without one. Nothing here is
+       positional, so a card added, moved, or removed above renumbers
+       nothing — and a new card of either kind is translated the moment it
+       is written. The three strings are the intake panel's own `layouts`
+       labels, verbatim, so the mark reads identically on both surfaces. */
+    ['.gallery .layout[data-layout="reflow"]', '↔ 어떤 화면에도 맞춰 흐름', '↔ 隨螢幕自動重排', 1],
+    ['.gallery .layout[data-layout="stage"]', '▭ 고정 16:9 스테이지 — 휴대폰에서는 레터박스', '▭ 固定 16:9 舞台 — 手機上留黑邊', 1],
     ['.card.yours .yours-hint', '당신의 스타일 자리', '你的風格在這'],
     ['.card.yours .open', '방법 보기', '看怎麼做'],
     ['.card.yours .meta h3', '나의 템플릿 <span class="kind">나의 것</span>', '你的範本 <span class="kind">你的</span>'],
