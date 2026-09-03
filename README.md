@@ -25,20 +25,23 @@ here is a second copy of it.
 
 **In this repository**
 
-- `site/` — five tracked files: `index.html`, `404.html`, `llms.txt`,
-  `robots.txt`, and `sync.sh`. Everything else under `site/` is assembled and
-  gitignored.
+- `site/` — six tracked files: `index.html`, `lisa-ppt.html`, `404.html`,
+  `llms.txt`, `robots.txt`, and `sync.sh`. Everything else under `site/` is
+  assembled and gitignored.
 - `previews/*.html` — the live previews, one per registry template. Real
   generated files, not screenshots: open one and it behaves like the deck it
-  came from. The gallery links to every one it has a card for.
+  came from. The gallery links to every one, and a gate makes sure of it.
 - `assets/` — the brand images the landing page uses: the hero, the framed
   figure, and the social/SEO cover.
 - `functions/` — two Cloudflare Pages Functions, `e.js` and `SKILL.md.js`.
+- `scripts/check_gallery.py` — the gate that holds the landing page's gallery
+  to the template registry. See *Two galleries, two mechanics* below.
 - `.github/workflows/deploy-pages.yml` — the deploy.
 
 **In the skill repository, read at build time**
 
-- `templates/templates.json` — the registry the gallery is built from.
+- `templates/templates.json` — the registry. The intake panel is built from
+  it; the landing page's gallery is held to it by a gate.
 - `templates/thumbs/*.png` — the gallery thumbnails.
 - `assets/tedandlisa-intake.html` — the intake panel served at `/intake.html`.
 - `assets/monomind-mark-white.svg` — the MonoMind mark, which also becomes the
@@ -46,8 +49,49 @@ here is a second copy of it.
 
 Splitting the site out of the skill was a packaging decision, not a decision to
 keep two copies of the gallery. The registry, the panel and the thumbnails stay
-canonical where the skill is, and the build reaches across for them — so a
-template added to the skill appears on the website with nothing here to update.
+canonical where the skill is, and the build reaches across for them.
+
+
+### Two galleries, two mechanics
+
+**Read this before adding a template.** This site shows the templates twice,
+and the two galleries are built differently:
+
+- **The intake panel** at `/intake.html` is **generated**. `site/sync.sh` builds
+  its card list from `templates/templates.json` at build time, so a template
+  added to the skill appears there with nothing here to update.
+- **The gallery on the landing page** is **hand-written**. Its cards are prose
+  in `site/index.html`, with copy written for a reader of this page and
+  translated into Korean and Traditional Chinese in the `T` table at the bottom
+  of the same file. So a new template does **not** appear on the landing page by
+  itself. Somebody has to write the card.
+
+That is deliberate, not a gap waiting to be closed: the card copy is editorial
+and better than the registry's taglines — the registry says "Horizontal
+presentation deck, dark ink and accent halos" where the card says "The
+presentation deck. Horizontal slides, deck menu, keyboard and touch navigation,
+EN → KR / ZH translation on demand." Generating the gallery from the registry
+would overwrite hand-tuned copy in three languages with blander text.
+
+What was a gap is that nothing checked. `motion-website` sat in the registry for
+a whole release wave with no card on the landing page: its preview was generated,
+copied and served, and reachable only by typing the URL. So the gallery is
+hand-written **but gated**. `scripts/check_gallery.py` fails the build when the
+registry and the gallery disagree — a registry template with no card, a card
+whose preview or thumbnail does not resolve, a card pointing at a template that
+no longer exists — and it names every discrepancy by template id:
+
+```sh
+python3 scripts/check_gallery.py     # registry at .skill/, or $SKILL_DIR
+```
+
+It runs in the PR check and in the deploy, before the assembly, so an
+incomplete gallery cannot ship. The two cards with no template behind them —
+the "Your Template" bridge card and Lisa's PPT, which is a separate product
+this site builds nothing for — are named in the script with the reason, so the
+gate stays narrow. One consequence worth knowing: because the check reads the
+skill repository's `main`, a template merged there turns every subsequent PR
+here red until its card is written. That is the pressure working, not a fault.
 
 
 ---
@@ -74,11 +118,14 @@ the runner would inject it), and `site/assets/` (the brand images, the mark, the
 solid-white mark, and a favicon derived from it).
 
 The deploy is `.github/workflows/deploy-pages.yml`, on every push to `main`. It
-checks out both repositories, runs the skill repository's
-`scripts/tedandlisa_intake_fallback.py --check` as a gate — the intake panel
-carries a generated fallback template list for `file://` use, and a drifted one
-would ship a gallery missing a template — then `site/sync.sh`, then
-`wrangler pages deploy site` from the repository root.
+checks out both repositories, runs two gates — one per gallery — then
+`site/sync.sh`, then `wrangler pages deploy site` from the repository root. The
+gates are the skill repository's `scripts/tedandlisa_intake_fallback.py --check`
+(the intake panel carries a generated fallback template list for `file://` use,
+and a drifted one would ship a gallery missing a template) and this
+repository's `scripts/check_gallery.py` (the landing page's gallery is
+hand-written, and a missing card would ship a template with no way to reach it).
+Either one stops the deploy.
 
 The root matters. Wrangler compiles `functions/` from the current working
 directory, so deploying `site` *from the root* is what carries the functions up
