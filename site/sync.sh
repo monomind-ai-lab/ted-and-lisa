@@ -95,9 +95,18 @@ skill = pathlib.Path(os.environ["SKILL"])
 entries = json.loads((skill / "templates/templates.json").read_text())["templates"]
 cards = []
 for t in entries:
+    # This projection is a whitelist, so a registry field it does not name is
+    # dropped on the way to the panel — silently, and visible only as a card
+    # missing a line nobody remembers writing. `requires` is an install
+    # precondition ("this needs X on the machine before it can run"), a
+    # different claim from `dependencies` ("this file loads Y at runtime"),
+    # and the one a reader needs first when deciding whether a template is
+    # usable at all. No entry carries it yet, so the key is simply absent
+    # from every card until the registry upstream ships it; nothing here has
+    # to change on the day it does.
     card = {k: t.get(k) for k in
             ("id", "name", "tagline", "kind", "type", "layout", "best_for", "dependencies",
-             "languages", "preview", "skill", "badge") if t.get(k) is not None}
+             "requires", "languages", "preview", "skill", "badge") if t.get(k) is not None}
     # `thumb` and `preview` are registry paths, relative to the skill repo.
     # Only their basenames survive: both land flat in site/previews/.
     thumb = skill / t.get("thumb", "")

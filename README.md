@@ -28,9 +28,9 @@ here is a second copy of it.
 - `site/` — five tracked files: `index.html`, `404.html`, `llms.txt`,
   `robots.txt`, and `sync.sh`. Everything else under `site/` is assembled and
   gitignored.
-- `previews/*.html` — the nine live previews the gallery links to. Real
+- `previews/*.html` — the live previews, one per registry template. Real
   generated files, not screenshots: open one and it behaves like the deck it
-  came from.
+  came from. The gallery links to every one it has a card for.
 - `assets/` — the brand images the landing page uses: the hero, the framed
   figure, and the social/SEO cover.
 - `functions/` — two Cloudflare Pages Functions, `e.js` and `SKILL.md.js`.
@@ -68,8 +68,8 @@ is absent, the script says which one and exits non-zero — a silent partial
 build would deploy a page whose gallery is empty and whose intake panel is
 missing, and it would look fine from the outside.
 
-What it produces, all gitignored: `site/previews/` (nine previews and nine
-thumbnails), `site/intake.html` (the panel, with the template list injected as
+What it produces, all gitignored: `site/previews/` (the previews and the
+gallery thumbnails), `site/intake.html` (the panel, with the template list injected as
 the runner would inject it), and `site/assets/` (the brand images, the mark, the
 solid-white mark, and a favicon derived from it).
 
