@@ -48,7 +48,10 @@ machinery.
 
 ## Notes for agents
 
-- Every deliverable is one standalone .html file; there is no .pptx output.
+- Every deliverable of this skill is one standalone .html file; it has no
+  .pptx output. PowerPoint is a separate, install-only repository, Lisa's PPT
+  (https://github.com/monomind-ai-lab/lisa-ppt) — nothing on this site builds
+  or hosts it.
 - Filenames, commands, and product names must never be machine-translated.
 - Output can carry two languages in one file (English plus Korean or
   Traditional Chinese by default).
