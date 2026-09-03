@@ -35,7 +35,9 @@ here is a second copy of it.
   figure, and the social/SEO cover.
 - `functions/` — two Cloudflare Pages Functions, `e.js` and `SKILL.md.js`.
 - `scripts/check_gallery.py` — the gate that holds the landing page's gallery
-  to the template registry. See *Two galleries, two mechanics* below.
+  to the template registry, and `scripts/check_gallery_translations.py`, the
+  gate that holds each of its cards to the page's translation table. See
+  *Two galleries, two mechanics* below.
 - `.github/workflows/deploy-pages.yml` — the deploy.
 
 **In the skill repository, read at build time**
@@ -93,6 +95,39 @@ gate stays narrow. One consequence worth knowing: because the check reads the
 skill repository's `main`, a template merged there turns every subsequent PR
 here red until its card is written. That is the pressure working, not a fault.
 
+**Writing the card is half of it.** The card copy is also translated by hand:
+Korean and Traditional Chinese live in the `T` table near the bottom of
+`site/index.html`, and `applyInline` swaps them in place. A card with no
+entries there does not fail and does not look broken — it renders its English
+badge and its English paragraph inside a page that is otherwise Korean, in the
+one section a reader scrolls to decide whether this is for them. So there is a
+second gate beside the first:
+
+```sh
+python3 scripts/check_gallery_translations.py    # needs nothing but site/
+```
+
+It checks every card's `kind` badge and every paragraph in its `meta`, names
+the cards nothing translates, and prints the entry to add. It also catches the
+reverse — an entry whose card was renamed or renumbered out from under it, so
+that it now translates nothing.
+
+When you write the entries, **key them on the card's `href`**, like this:
+
+```js
+['.gallery a[href="previews/your-template.html"] .kind', '…', '…'],
+['.gallery a[href="previews/your-template.html"] .meta p', '…', '…'],
+```
+
+The seven oldest entries are keyed on `.gallery .card:nth-child(N)` instead,
+and those are only correct while nothing above them renumbers — insert a card
+at the top and each one quietly slides onto the wrong card. An entry keyed on
+its href takes its translations with it wherever the card ends up. The gate
+catches the boundary of a renumber, where the shift runs off the end of the
+positional block; it cannot tell one Korean paragraph from another, so it
+cannot catch the middle of one. Both limits are written down at the top of the
+script.
+
 
 ---
 
@@ -118,14 +153,17 @@ the runner would inject it), and `site/assets/` (the brand images, the mark, the
 solid-white mark, and a favicon derived from it).
 
 The deploy is `.github/workflows/deploy-pages.yml`, on every push to `main`. It
-checks out both repositories, runs two gates — one per gallery — then
-`site/sync.sh`, then `wrangler pages deploy site` from the repository root. The
-gates are the skill repository's `scripts/tedandlisa_intake_fallback.py --check`
+checks out both repositories, runs three gates, then `site/sync.sh`, then
+`wrangler pages deploy site` from the repository root. Two of them are one per
+gallery: the skill repository's `scripts/tedandlisa_intake_fallback.py --check`
 (the intake panel carries a generated fallback template list for `file://` use,
 and a drifted one would ship a gallery missing a template) and this
 repository's `scripts/check_gallery.py` (the landing page's gallery is
 hand-written, and a missing card would ship a template with no way to reach it).
-Either one stops the deploy.
+The third is this repository's `scripts/check_gallery_translations.py` (the
+card copy is hand-written in three languages, and a card with no entries ships
+English into a Korean page). It reads `site/index.html` alone, needing neither
+checkout's registry, so it runs first. Any one of the three stops the deploy.
 
 The root matters. Wrangler compiles `functions/` from the current working
 directory, so deploying `site` *from the root* is what carries the functions up
