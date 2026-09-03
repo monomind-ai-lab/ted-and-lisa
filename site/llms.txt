@@ -59,5 +59,7 @@ machinery.
   Traditional Chinese by default).
 - The shapes are: a presentation deck, a web document, a diagram-first deck, a
   single architecture diagram, a sitemap/IA proposal with a clickable
-  navigation prototype, a project website, and a motion website — the same
-  project site with an animation layer. Do not assume slides.
+  navigation prototype, a project website, a motion website — the same project
+  site with an animation layer — an evidence deck that argues from numbers, and
+  a paper brief paced in chapters. Ten in all, one per gallery card. Do not
+  assume slides.
