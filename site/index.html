@@ -839,14 +839,15 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           one shared footer. This very site's sibling.</p>
           <span class="layout" data-layout="reflow">↔ Reflows to any screen</span></div>
         </a>
-        <!-- Appended after the seven cards that were already here, and before
-             the bridge card below. Several gallery entries in `T` are keyed on
-             `.gallery .card:nth-child(N)` for N = 1…7, so inserting anywhere
-             above would silently point them at the wrong card; appending
-             leaves 1…7 where they were. It renumbers the bridge card below —
-             which has happened again since, so no number is written down
-             here — and every one of that card's entries is keyed on
-             `.card.yours`, so nothing of its moves. -->
+        <!-- Appended after the cards that were already here, and before the
+             bridge card below. That was once a constraint rather than a
+             choice: seven entries in `T` were keyed on
+             `.gallery .card:nth-child(N)`, and inserting anywhere above them
+             would have handed each of those seven the next card's copy. Every
+             entry is keyed on its card's href now and the gate rejects a
+             positional one, so a card may go wherever it reads best — this
+             one stays where it landed because there is no reason to move
+             it. -->
         <a class="card handoff" target="_blank" href="previews/slide-design.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/slide-design.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Slide Design <span class="kind">handoff</span></h3>
@@ -875,12 +876,11 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
              missing, so previews/motion-website.html was reachable only by
              typing the URL.
 
-             Position 10, which is past the seven `T` entries keyed on
-             `.gallery .card:nth-child(N)` for N = 1…7: those stay exactly
-             where they were. It pushes the bridge card from 10 to 11 and
-             Lisa's PPT from 11 to 12, and neither notices — the bridge card
-             is keyed on `.card.yours` and Lisa's PPT on its href. This one
-             is keyed on its own href for the same reason. -->
+             It went in at position 10, which at the time was the first spot
+             past the seven positional `T` entries — the only place a card
+             could be added without silently moving one of them. Those seven
+             are keyed on their hrefs now, like this card and every other, so
+             position carries no meaning here any more. -->
         <a class="card" target="_blank" href="previews/motion-website.html" rel="noopener noreferrer">
           <div class="frame"><img src="previews/motion-website.png" alt="" loading="lazy"><span class="open">Open live preview</span></div>
           <div class="meta"><h3>Motion Website <span class="kind">site</span></h3>
@@ -900,14 +900,12 @@ Read and follow https://html.monomind.one/SKILL.md, starting with its intake pan
           <b>See how →</b></p></div>
         </a>
         <!-- Last, which is what D-035 asks for and not merely where there
-             happened to be room. Several entries in `T` are keyed on
-             `.gallery .card:nth-child(N)` for N = 1…7; inserting anywhere
-             before those would move one of them and silently point an entry
-             at the wrong card. Sitting at the end leaves every one of them
-             where it is. Its own entries in `T` are keyed on its href rather
-             than a position, so it takes its translations with it — which is
-             also why the card ahead of it could be appended without touching
-             anything here.
+             happened to be room. That is now the whole reason: it used to be
+             reinforced by the seven positional entries in `T`, which any card
+             inserted ahead of them would have moved onto the wrong card.
+             Every entry is keyed on its card's href now, so the end of the
+             gallery is where D-035 puts this card, not where the table
+             cornered it.
 
              It is the only card in this gallery that is not a live preview,
              and the only one that leaves the gallery rather than opening in
@@ -1492,25 +1490,30 @@ function googleTranslateElementInit() {
     ['#tpl-h', '모든 형태, 실물로 미리보기.', '每一種形態，真實預覽。'],
     ['#templates .section-head p:not(.kicker)', '목업이 아닙니다 — 아래 미리보기는 전부 실제로 생성된 파일입니다. 열어 보고, 발표해 보고, 크기도 바꿔 보세요. 보이는 그대로 에이전트가 만들어 줍니다. 더 많은 템플릿이 준비 중이고, 설치하면 마음에 드는 페이지를 직접 추가할 수도 있습니다.', '這些不是示意圖 — 下面每個預覽都是真正生成的檔案。打開它、簡報它、縮放它，你看到的就是 agent 交付的。更多範本正在路上 — 安裝之後，任何你喜歡的頁面都能加入。'],
     ['.gallery .open', '라이브 미리보기', '開啟即時預覽', 1],
-    ['.gallery .card:nth-child(1) .kind', '슬라이드', '投影片'],
-    ['.gallery .card:nth-child(1) .meta p', '프레젠테이션 덱. 가로 슬라이드, 덱 메뉴, 키보드·터치 내비게이션, 필요할 때 EN → KR/ZH 번역.', '簡報用的 deck。橫向投影片、簡報選單、鍵盤與觸控導覽，隨需 EN → KR / ZH 翻譯。'],
-    ['.gallery .card:nth-child(2) .kind', '문서', '文件'],
-    ['.gallery .card:nth-child(2) .meta p', '스크롤되는 해시 라우팅 페이지. 두 언어가 본문에 함께 담긴, 사이트처럼 읽히는 이중언어 문서.', '以 hash 路由、可捲動的頁面。兩種語言直接寫在內文 — 讀起來像網站的雙語文件。'],
-    ['.gallery .card:nth-child(3) .kind', '다이어그램', '圖表'],
-    ['.gallery .card:nth-child(3) .meta p', '밝은 종이 위 다이어그램 중심 슬라이드. 인라인 SVG, CDN 없음, 완전 오프라인 — 다이어그램까지 번역됩니다.', '淺色紙面上以圖表為主的投影片。內嵌 SVG、無 CDN、完全離線 — 連圖表都能翻譯。'],
-    ['.gallery .card:nth-child(4) .kind', '다이어그램', '圖表'],
-    ['.gallery .card:nth-child(4) .meta p', '슬레이트 위 시스템 다이어그램, 의미가 담긴 색상. 그림 한 장으로 충분할 때는 한 장으로, 필요하면 여러 관점을 전환하며.', '石板色底上的系統架構圖，顏色皆有語意。一張圖就說完時就一張，需要時也能切換多個視角。'],
-    ['.gallery .card:nth-child(5) .kind', '제안', '提案'],
-    ['.gallery .card:nth-child(5) .meta p', '페이지로 논증하는 사이트 구조 — 두 가지 화면 크기에서 클릭되는 내비게이션 프로토타입으로 마무리.', '用頁面論證網站結構，最後附上兩種斷點下可點擊的導覽原型。'],
-    ['.gallery .card:nth-child(6) .kind', '사이트', '網站'],
-    ['.gallery .card:nth-child(6) .meta p', '프로젝트의 공개 얼굴 — 고정 내비게이션, 여덟 개의 해시 라우팅 페이지, 하나의 공용 푸터. 바로 이 사이트의 형제입니다.', '專案的門面 — 固定導覽列、八個 hash 路由頁面、一個共用頁尾。就是這個網站的兄弟。'],
-    ['.gallery .card:nth-child(7) .kind', '핸드오프', '交接'],
-    ['.gallery .card:nth-child(7) .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
+    ['.gallery a[href="previews/monomind-deck.html"] .kind', '슬라이드', '投影片'],
+    ['.gallery a[href="previews/monomind-deck.html"] .meta p', '프레젠테이션 덱. 가로 슬라이드, 덱 메뉴, 키보드·터치 내비게이션, 필요할 때 EN → KR/ZH 번역.', '簡報用的 deck。橫向投影片、簡報選單、鍵盤與觸控導覽，隨需 EN → KR / ZH 翻譯。'],
+    ['.gallery a[href="previews/web-document.html"] .kind', '문서', '文件'],
+    ['.gallery a[href="previews/web-document.html"] .meta p', '스크롤되는 해시 라우팅 페이지. 두 언어가 본문에 함께 담긴, 사이트처럼 읽히는 이중언어 문서.', '以 hash 路由、可捲動的頁面。兩種語言直接寫在內文 — 讀起來像網站的雙語文件。'],
+    ['.gallery a[href="previews/mermaid-master.html"] .kind', '다이어그램', '圖表'],
+    ['.gallery a[href="previews/mermaid-master.html"] .meta p', '밝은 종이 위 다이어그램 중심 슬라이드. 인라인 SVG, CDN 없음, 완전 오프라인 — 다이어그램까지 번역됩니다.', '淺色紙面上以圖表為主的投影片。內嵌 SVG、無 CDN、完全離線 — 連圖表都能翻譯。'],
+    ['.gallery a[href="previews/architecture.html"] .kind', '다이어그램', '圖表'],
+    ['.gallery a[href="previews/architecture.html"] .meta p', '슬레이트 위 시스템 다이어그램, 의미가 담긴 색상. 그림 한 장으로 충분할 때는 한 장으로, 필요하면 여러 관점을 전환하며.', '石板色底上的系統架構圖，顏色皆有語意。一張圖就說完時就一張，需要時也能切換多個視角。'],
+    ['.gallery a[href="previews/sitemap-ia.html"] .kind', '제안', '提案'],
+    ['.gallery a[href="previews/sitemap-ia.html"] .meta p', '페이지로 논증하는 사이트 구조 — 두 가지 화면 크기에서 클릭되는 내비게이션 프로토타입으로 마무리.', '用頁面論證網站結構，最後附上兩種斷點下可點擊的導覽原型。'],
+    ['.gallery a[href="previews/project-website.html"] .kind', '사이트', '網站'],
+    ['.gallery a[href="previews/project-website.html"] .meta p', '프로젝트의 공개 얼굴 — 고정 내비게이션, 여덟 개의 해시 라우팅 페이지, 하나의 공용 푸터. 바로 이 사이트의 형제입니다.', '專案的門面 — 固定導覽列、八個 hash 路由頁面、一個共用頁尾。就是這個網站的兄弟。'],
+    ['.gallery a[href="previews/slide-design.html"] .kind', '핸드오프', '交接'],
+    ['.gallery a[href="previews/slide-design.html"] .meta p', '하우스 스타일 너머 — 동반 디자인 파이프라인의 12가지 프리셋과 애니메이션 슬라이드. 그래도 HTML 파일 하나.', '跳脫預設風格 — 由附屬設計管線提供十二種預設與動畫投影片。依然是一個 HTML 檔。'],
     ['.card.handoff .prov', '이 미리보기는 실제 오픈소스 프로젝트의 덱을 리브랜딩한 것입니다 — 비공개 팩이 당신의 브랜드로 하는 일과 똑같습니다.', '這個預覽是把一個真實開源專案的簡報換上新品牌 — 私有範本包對你的品牌做的，就是同一件事。'],
-    /* Every card added since is keyed on its own preview href, not on
-       `:nth-child` — the seven entries above are positional and only stay
-       correct while nothing above them renumbers. A card keyed on its own
-       href takes its selector with it wherever it ends up. */
+    /* Every card is keyed on its own href. The seven above were positional
+       once — `.gallery .card:nth-child(N)` for N = 1…7 — which only stayed
+       correct while nothing above them renumbered: insert a card at the top
+       and each entry slid onto the next card, handing every one of those
+       seven its neighbour's copy. Every card still got Korean, so nothing
+       looked broken and no check could tell one paragraph from another.
+       An href key takes its selector with it wherever the card ends up, and
+       scripts/check_gallery_translations.py now rejects a positional one, so
+       the hazard cannot come back. */
     ['.gallery a[href="previews/evidence-deck.html"] .kind', '슬라이드', '投影片'],
     ['.gallery a[href="previews/evidence-deck.html"] .meta p', '숫자로 논증하는 슬라이드. 어두운 바탕에 세로 스크롤 스냅 — 강조된 행이 있는 데이터 표, 수치 행, 판정 바.', '用數字論證的投影片。深色底、垂直捲動吸附 — 會標出重點列的資料表、數據列、結論條。'],
     ['.gallery a[href="previews/paper-brief.html"] .kind', '브리프', '簡報'],
