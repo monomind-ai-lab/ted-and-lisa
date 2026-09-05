@@ -52,8 +52,18 @@ What is checked, reporting every gap rather than the first:
      card's paragraph and not for the `.prov` line below it.
   3. The reverse: a gallery-scoped entry that reaches no element at all.
      A card renamed, removed or renumbered leaves its entries behind,
-     translating nothing -- the same hole seen from the other side, and the
-     reason the positional selectors are worth watching.
+     translating nothing -- the same hole seen from the other side.
+  4. No gallery entry keys a card by position. `:nth-child` addresses
+     whatever card is standing there at the time, so a card inserted above
+     one hands it the next card's copy: every card still gets a string, just
+     the wrong one, and nothing static can tell one Korean paragraph from
+     another. That was checks 1 and 2's blind spot, and the reason they
+     could only catch such a shift at its boundary -- the first card past
+     the positional block, which loses its entry outright and is the one
+     card in the run whose copy is *not* misplaced. Rejecting the shape
+     removes the failure rather than reporting it late: an href key names
+     one card and travels with it, and check_gallery.py already fails the
+     build when two cards share an href, so the naming stays unique.
 
 Entries carrying the all-flag are read but never counted as covering a
 card's own copy. `.gallery .open` and `.gallery .layout[data-layout=...]`
@@ -71,13 +81,11 @@ are all real:
     static prose that changes when somebody rewrites a section, and a
     rewrite is reviewed. The gallery is the part that grows by appending,
     which is how a card arrives with no entries behind it.
-  * A card that has taken over another card's positional entry. Insert a
-    card above the seven `:nth-child` entries and every one of them slides
-    down a card: each card still gets a string, just the wrong card's, and
-    nothing static can tell one Korean paragraph from another. What does
-    fail is the boundary -- the first card past the positional block loses
-    its entry outright -- which is where a shift stops being invisible, and
-    is why the suggestion below is always the card's own href.
+  * Whether the right copy reached the right card. Two Korean paragraphs
+    are both strings; nothing here reads them. This used to leave a real
+    hole -- a card inserted above a positional entry moved the whole run
+    onto the wrong cards, invisibly -- which is why check 4 above forbids
+    the shape that made it possible rather than trying to detect it.
 
 One limit worth stating, since it is a real gap rather than a choice: a
 selector's first match is resolved within the gallery, because the gallery
@@ -433,6 +441,27 @@ def suggest(card: dict, slot: dict) -> str:
     return f'.gallery a[href="{card["href"]}"] {slot["sel"]}'
 
 
+def suggest_href(entry: dict, cards: list[dict]) -> str:
+    """The href form of a positional selector, when its card can be found.
+
+    The entry still resolves today -- that is the whole trouble with it -- so
+    the card it currently reaches is the card it means, and its href is the
+    key it should have carried. If it reaches nothing, there is no card to
+    name and the advice stays general.
+    """
+    if not entry["matches"]:
+        return "`.gallery a[href=\"…\"] …`, naming the card it belongs to."
+    card = entry["matches"][0][0]
+    # Everything to the right of the compound that carried the position: that
+    # part already names the slot inside the card and is kept verbatim. parse()
+    # splits on whitespace, so the compounds line up with the raw chunks.
+    chunks = entry["selector"].split()
+    at = next(i for i, c in enumerate(entry["compounds"]) if c["nth"] is not None)
+    tail = " ".join(chunks[at + 1:]) or "…"
+    return f"['.gallery a[href=\"{card['href']}\"] {tail}', …] — "\
+           f"{card['name'] or 'that card'}."
+
+
 def main() -> int:
     argparse.ArgumentParser(
         description="Gate every card in site/index.html's gallery on having "
@@ -533,7 +562,25 @@ def main() -> int:
 
     # ── table → cards ─────────────────────────────────────────────────
     for entry in table:
-        if entry["scoped"] and not entry["matches"]:
+        if not entry["scoped"]:
+            continue
+        # A positional key addresses a slot in the gallery, not a card. It is
+        # correct only until something above it renumbers, and the failure it
+        # then causes is the one this gate cannot see -- so the shape is
+        # refused outright rather than watched.
+        positional = [c for c in (entry["compounds"] or [])
+                      if c["nth"] is not None]
+        if positional:
+            nths = ", ".join(f":nth-child({c['nth']})" for c in positional)
+            problems.append(
+                f"the `T` entry at site/index.html:{entry['line']} keys "
+                f"{entry['selector']!r} by position ({nths}). That addresses "
+                f"whatever card is standing there, so a card inserted above "
+                f"it hands this entry's copy to the wrong card — and every "
+                f"card still gets a string, which is why nothing here could "
+                f"catch it. Key it on the card's own href instead: "
+                f"{suggest_href(entry, cards)}")
+        if not entry["matches"]:
             problems.append(
                 f"the `T` entry at site/index.html:{entry['line']} keys "
                 f"{entry['selector']!r}, which reaches nothing in the "

@@ -109,8 +109,8 @@ python3 scripts/check_gallery_translations.py    # needs nothing but site/
 
 It checks every card's `kind` badge and every paragraph in its `meta`, names
 the cards nothing translates, and prints the entry to add. It also catches the
-reverse — an entry whose card was renamed or renumbered out from under it, so
-that it now translates nothing.
+reverse — an entry whose card was renamed or removed out from under it, so that
+it now translates nothing.
 
 When you write the entries, **key them on the card's `href`**, like this:
 
@@ -119,14 +119,17 @@ When you write the entries, **key them on the card's `href`**, like this:
 ['.gallery a[href="previews/your-template.html"] .meta p', '…', '…'],
 ```
 
-The seven oldest entries are keyed on `.gallery .card:nth-child(N)` instead,
-and those are only correct while nothing above them renumbers — insert a card
-at the top and each one quietly slides onto the wrong card. An entry keyed on
-its href takes its translations with it wherever the card ends up. The gate
-catches the boundary of a renumber, where the shift runs off the end of the
-positional block; it cannot tell one Korean paragraph from another, so it
-cannot catch the middle of one. Both limits are written down at the top of the
-script.
+That is not a style preference, and the gate enforces it: **a `:nth-child` key
+fails the build.** Fourteen entries used to be written that way, and a
+positional key addresses whatever card is standing in that slot rather than the
+card you meant. Insert a card above one and the whole run slides down — every
+card still gets Korean, just the next card's, and no static check can tell one
+Korean paragraph from another. The gate could only ever have caught such a
+shift at its boundary, where it runs off the end of the block, and there it
+names the one card in the run whose copy is *not* misplaced. Refusing the shape
+removes the failure instead of reporting it late and in the wrong place; an
+href key names one card and travels with it, and `check_gallery.py` already
+fails the build when two cards share an href.
 
 
 ---
