@@ -79,9 +79,10 @@ Deliberately not checked, so that the failures this prints are all real:
     change.
   * Translation coverage. Each card also needs entries in the `T` table at
     the bottom of index.html or it stays English in Korean and Chinese.
-    Every card has them today. Gating it means matching `T`'s selectors --
-    some positional, some by href, some by class -- against the cards, and
-    that is a second gate, not a clause of this one.
+    That is the same class of drift, but it is answerable from index.html
+    alone, where this gate cannot run at all without a checkout of the skill
+    repository -- so it is a second gate, not a clause of this one:
+    scripts/check_gallery_translations.py, which reuses the parser below.
 """
 
 from __future__ import annotations
@@ -117,6 +118,12 @@ VOID = {"img", "br", "hr", "input", "meta", "link", "source", "area",
         "base", "col", "embed", "param", "track", "wbr"}
 
 
+def node(tag: str, classes: set, attrs: dict, line: int) -> dict:
+    """One element of a card, as GalleryCards records it."""
+    return {"tag": tag, "classes": classes, "attrs": attrs, "children": [],
+            "text": "", "line": line}
+
+
 class GalleryCards(HTMLParser):
     """The <a class="card"> children of <div class="gallery">, in order.
 
@@ -125,18 +132,29 @@ class GalleryCards(HTMLParser):
     both of those confuse pattern matching in ways that would show up as a
     card silently not counted -- which is the failure this gate exists to
     catch, so it must not be able to cause it.
+
+    Each card also carries `tree`: its own element tree, rooted at the <a>,
+    each node {tag, classes, attrs, children, text, line}. This gate does not
+    need it -- href, thumbnail and name are all it reads -- but the sibling
+    gate scripts/check_gallery_translations.py matches the `T` table's
+    selectors against the cards, and that needs the elements inside them.
+    It lives here so there is one parser of this gallery rather than two
+    that can disagree about what a card is; `gallery` is the container node,
+    which those selectors are written against.
     """
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.cards: list[dict] = []
         self.found_gallery = False
+        self.gallery: dict | None = None
         self._in_gallery = False
         self._depth = 0
         self._card: dict | None = None
         self._card_depth = 0
         self._in_h3 = False
         self._in_kind = False
+        self._open: list[dict] = []   # element stack inside the current card
 
     def handle_starttag(self, tag: str, attrs: list) -> None:
         a = dict(attrs)
@@ -145,6 +163,7 @@ class GalleryCards(HTMLParser):
             if tag == "div" and "gallery" in cls:
                 self._in_gallery = True
                 self.found_gallery = True
+                self.gallery = node(tag, cls, a, self.getpos()[0])
                 self._depth = 1  # we are now inside the gallery div
             return
         if tag == "a" and "card" in cls and self._card is None:
@@ -156,9 +175,18 @@ class GalleryCards(HTMLParser):
                 "noshot": False,
                 "name": "",
                 "line": self.getpos()[0],
+                "tree": None,
             }
             self._card_depth = self._depth
+            self._open = []
         if self._card is not None:
+            el = node(tag, cls, a, self.getpos()[0])
+            if self._open:
+                self._open[-1]["children"].append(el)
+            else:
+                self._card["tree"] = el
+            if tag not in VOID:
+                self._open.append(el)
             if tag == "img" and self._card["img"] is None:
                 self._card["img"] = a.get("src", "")
             elif tag == "h3":
@@ -175,6 +203,8 @@ class GalleryCards(HTMLParser):
         if not self._in_gallery or tag in VOID:
             return
         self._depth -= 1
+        if self._card is not None and self._open:
+            self._open.pop()
         if tag == "h3":
             self._in_h3 = False
         elif tag == "span":
@@ -187,7 +217,11 @@ class GalleryCards(HTMLParser):
             self._in_gallery = False
 
     def handle_data(self, data: str) -> None:
-        if self._card is not None and self._in_h3 and not self._in_kind:
+        if self._card is None:
+            return
+        if self._open:
+            self._open[-1]["text"] += data
+        if self._in_h3 and not self._in_kind:
             self._card["name"] += data
 
 
